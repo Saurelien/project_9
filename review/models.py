@@ -4,8 +4,26 @@ from django.db import models
 
 
 class Ticket(models.Model):
-    # Your Ticket model definition goes here
-    pass
+    """
+    Class servant a tracer les erreur remonté par les utlisateurs
+    """
+    STATUS_CHOICES = (
+        ('New', 'New'),
+        ('In Progress', 'In Progress'),
+        ('Resolved', 'Resolved'),
+        ('Closed', 'Closed'),
+    )
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
+    assigned_to = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    # Add any other fields you need, such as priority, due date, etc.
+
+    def __str__(self):
+        return self.title
 
 
 class Review(models.Model):
