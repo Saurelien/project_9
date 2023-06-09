@@ -5,7 +5,7 @@ from django.db import models
 
 class Ticket(models.Model):
     """
-    Class servant a tracer les erreur remonté par les utlisateurs
+    Class servant a tracer les erreurs remontées par les utlisateurs
     """
     STATUS_CHOICES = (
         ('New', 'New'),
@@ -39,9 +39,11 @@ class Review(models.Model):
 
 
 class UserFollows(models.Model):
-    # Your UserFollows model definition goes here
+    follower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='following')
+    followed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='followers')
 
     class Meta:
-        # ensures we don't get multiple UserFollows instances
-        # for unique user-user_followed pairs
-        unique_together = ('user', 'followed_user', )
+        unique_together = ('follower', 'followed_user')
+
+    def __str__(self):
+        return f'{self.follower} follows {self.followed_user}'

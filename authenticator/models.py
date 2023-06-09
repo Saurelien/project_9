@@ -18,21 +18,15 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password)
 
 
-USERNAME_FIELD = 'email'
-REQUIRED_FIELDS = ['first_name', 'last_name']
-
-
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
 
-    username_field = USERNAME_FIELD
-    required_fields = REQUIRED_FIELDS
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def get_full_name(self):
         # petit rappel des self du projet 4 :)
@@ -42,5 +36,8 @@ class User(AbstractBaseUser):
     def get_short_name(self):
         return self.first_name
 
-    def permition(self, permission):
+    def permission(self, permission):
         pass
+
+    def user_activity(self):
+        """ Verifier si l'utilisateur est en ligne ? """
