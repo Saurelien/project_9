@@ -45,3 +45,15 @@
   justify-content: space-between;
   margin-bottom: 10px;
 }
+
+.register-page {
+    background-color: orange;
+    padding: 50px;
+}
+
+.register-title {
+    font-size: 48px;
+    color: black;
+    text-align: center;
+    animation: wave-animation 2s infinite;
+}
