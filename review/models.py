@@ -19,8 +19,6 @@ class Ticket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
-    assigned_to = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    # Add any other fields you need, such as priority, due date, etc.
 
     def __str__(self):
         return self.title

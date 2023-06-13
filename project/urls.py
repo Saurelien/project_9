@@ -16,11 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from authenticator import views
+from authenticator import views # import les vues de l'app authenticator
+from project.views import skeleton_view # importe la vue du projet pour une page d'acceuille
 
 urlpatterns = [
+    path('', skeleton_view, name='skeleton'),
     path('admin/', admin.site.urls),
-    path('project/register/', views.register, name='register'),
-    path('project/login/', views.user_login, name='login'),
-    path('project/logout/', views.user_logout, name='logout'),
+    path('register/', views.register, name='register'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    path('reset_password', views.reset_password, name='reset_password')
 ]

@@ -1,16 +1,32 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.mail import send_mail
+
+"""Exemple de conception des method*
+car = {
+  "brand": "Ford",
+  "model": "Mustang",
+  "year": 1964
+}
+
+x = car.setdefault("color", "white")
+
+print(x)
+"""
+
+USERNAME_FIELD = 'email'
+REQUIRED_FIELDS = ['first_name', 'last_name']
 
 
 class UserManager(BaseUserManager):
     # extra fields permet de spécifié des champs supplémentaire (date de naissance, numero de telephone).
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password=None):
         if not email:
             raise ValueError("L'adresse e-mail doit être spécifiée.")
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email)
         user.set_password(password)
-        user.save(using=self.Quelquechose_TEST)
+        user.save()
         return user
 
     def create_superuser(self, email, password=None):
@@ -25,8 +41,15 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    username_form = USERNAME_FIELD
+    fields_required = REQUIRED_FIELDS
+
+    def send_registration_mail(self):
+        title = "Bienvenue chez LiteReview !"
+        message = "Merci de vous être enregistrer chez LiteReview !"
+        recipient_list = [self.email]
+        sender = settings.EMAIL_HOST_USER
+        send_mail(title, message, sender, [self.email], recipient_list)()
 
     def get_full_name(self):
         # petit rappel des self du projet 4 :)

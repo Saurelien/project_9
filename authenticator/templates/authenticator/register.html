@@ -1,10 +1,38 @@
-{% extends 'base.html' %}
-
-{% block content %}
-  <h2>S'enregistrer au site</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-  </form>
+<!-- register.html -->
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'authenticator/register.css' %}">
 {% endblock %}
+{% block content %}
+  <div class="register-container">
+    <h2 class="register-title">Bienvenue sur LiteReview</h2>
+    <p class="register-description">Remplissez les champs marqués d'une "*" ci-dessous :</p>
+
+    <form method="POST" class="register-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Nom d'utilisateur *</label>
+        {{ form.username }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">Email *</label>
+        {{ form.email }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password1.id_for_label }}">Mot de passe *</label>
+        {{ form.password1 }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password2.id_for_label }}">Confirmer le mot de passe *</label>
+        {{ form.password2 }}
+      </div>
+      <button type="submit" class="register-button">S'inscrire</button>
+    </form>
+  </div>
+{% endblock %}
+
+
+
+
+
