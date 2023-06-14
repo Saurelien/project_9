@@ -35,7 +35,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
@@ -43,13 +42,6 @@ class User(AbstractBaseUser):
 
     username_form = USERNAME_FIELD
     fields_required = REQUIRED_FIELDS
-
-    def send_registration_mail(self):
-        title = "Bienvenue chez LiteReview !"
-        message = "Merci de vous être enregistrer chez LiteReview !"
-        recipient_list = [self.email]
-        sender = settings.EMAIL_HOST_USER
-        send_mail(title, message, sender, [self.email], recipient_list)()
 
     def get_full_name(self):
         # petit rappel des self du projet 4 :)

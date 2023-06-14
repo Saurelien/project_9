@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm
 from authenticator.models import User
@@ -11,10 +10,9 @@ def register(request):
         if form.is_valid():
             user = form.save()
             print(f"Nouvel utilisateur enregistré : {user.username} ({user.email})")
-            # Envoyer l'email de notification
-            user.send_registration_email()
             login(request, user)
-            return redirect('login')
+            # Redirige l'utilisateur vers la page d'accueil après validation de son inscription.
+            return redirect('skeleton')
     else:
         form = RegistrationForm()
     return render(request, 'authenticator/register.html', {'form': form})
@@ -33,7 +31,7 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirige vers la page d'accueil "SI"" la connexion "REUSSIT"
+            return redirect('home')  # Redirige vers la page des tickets 'SI' la connexion 'REUSSIT'"
     return render(request, 'authenticator/login.html')
 
 

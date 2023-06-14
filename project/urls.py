@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from authenticator import views # import les vues de l'app authenticator
-from project.views import skeleton_view # importe la vue du projet pour une page d'acceuille
+# import les vues de l'app authenticator
+from authenticator import views
+# importe la vue du projet pour une page d'acceuille
+from project.views import skeleton_view
+
 
 urlpatterns = [
     path('', skeleton_view, name='skeleton'),
