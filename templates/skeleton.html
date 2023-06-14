@@ -1,39 +1,9 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
     <title>LiteReview</title>
-    <style>
-        body {
-            background-color: orange;
-            padding: 50px;
-        }
-
-        .title {
-            font-size: 48px;
-            color: black;
-            text-align: center;
-            animation: wave-animation 2s infinite;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .block {
-            width: 45%;
-            background-color: white;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 10px;
-        }
-
-        @keyframes wave-animation {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'skeleton/skeleton.css' %}">
 </head>
 <body>
     <h1 class="title">LiteReview</h1>
@@ -47,17 +17,11 @@
         <div class="block">
             <h2 class="block-title">Connectez-vous</h2>
             <form class="login-form">
-                <div class="form-group">
-                    <label for="username">Nom d'utilisateur</label>
-                    <input type="text" id="username" name="username" style="margin-bottom: 10px;">
-                </div>
-                <div class="form-group">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" id="password" name="password" style="margin-bottom: 10px;">
-                </div>
-                <div class="form-group">
-                    <button type="submit" style="font-size: 16px;">Se connecter</button>
-                </div>
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password">
+                <button type="submit" class="login-button">Se connecter</button>
             </form>
         </div>
     </div>
