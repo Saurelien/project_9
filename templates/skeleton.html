@@ -3,10 +3,9 @@
 <head>
     <title>LiteReview</title>
     <style>
-        @keyframes wave-animation {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
+        body {
+            background-color: orange;
+            padding: 50px;
         }
 
         .title {
@@ -16,81 +15,51 @@
             animation: wave-animation 2s infinite;
         }
 
-        body {
-            background-color: orange;
-            padding: 50px;
+        .container {
+            display: flex;
+            justify-content: space-between;
         }
 
-        .burger-menu {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 999;
-            cursor: pointer;
-        }
-
-        .burger-menu span {
-            display: block;
-            width: 30px;
-            height: 4px;
-            background-color: black;
-            margin-bottom: 6px;
-            transition: transform 0.3s;
-        }
-
-        .burger-menu.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 6px);
-        }
-
-        .burger-menu.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .burger-menu.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -8px);
-        }
-
-        .content {
-            margin-top: 60px;
+        .block {
+            width: 45%;
+            background-color: white;
             padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
         }
 
-        .register-btn {
-            display: none;
-            width: 200px;
-            height: 40px;
-            background-color: black;
-            color: white;
-            text-align: center;
-            line-height: 40px;
-            margin: 20px auto;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-
-        .burger-menu.open ~ .content .register-btn {
-            display: block;
+        @keyframes wave-animation {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-<div class="burger-menu">
-    <span></span>
-    <span></span>
-    <span></span>
-</div>
+    <h1 class="title">LiteReview</h1>
 
-<h1 class="title">LiteReview</h1>
-
-<script>
-    document.querySelector('.burger-menu').addEventListener('click', function () {
-        this.classList.toggle('open');
-    });
-</script>
-
-<div class="content">
-    <div class="register-btn" onclick="window.location.href='/register/'">S'inscrire</div>
-</div>
-
+    <div class="container">
+        <div class="block">
+            <h2 class="block-title">Inscrivez-vous maintenant</h2>
+            <p>Texte et contenu du premier bloc</p>
+            <a href="/register" class="register-button">S'inscrire</a>
+        </div>
+        <div class="block">
+            <h2 class="block-title">Connectez-vous</h2>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" style="margin-bottom: 10px;">
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" style="margin-bottom: 10px;">
+                </div>
+                <div class="form-group">
+                    <button type="submit" style="font-size: 16px;">Se connecter</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
