@@ -1,0 +1,14 @@
+<!--Formulaire de création pour une critique-->
+<form method="POST" action="{% url 'create_ticket' %}">
+    {% csrf_token %}
+    <label for="contenu">Contenu de la critique :</label>
+    <textarea id="contenu" name="contenu"></textarea>
+    <button type="submit">Envoyer</button>
+</form>
+Notez que vous devrez personnaliser les styles CSS et les URL des liens dans le template flux.html en fonction de votre mise en page et de votre structure de projet.
+
+
+
+
+
+

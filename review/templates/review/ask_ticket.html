@@ -1,0 +1,7 @@
+<!-- demander_critique.html -->
+<form method="POST" action="{% url 'demander_critique' %}">
+    {% csrf_token %}
+    <label for="livre">Demande de critique pour le livre :</label>
+    <input type="text" id="livre" name="livre">
+    <button type="submit">Envoyer</button>
+</form>

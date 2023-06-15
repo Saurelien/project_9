@@ -1,0 +1,65 @@
+header {
+    background-color: #f7f7f7;
+    padding: 20px;
+    text-align: center;
+}
+
+header .title {
+    color: #33cc99;
+    font-size: 28px;
+    margin: 0;
+}
+
+/* Navigation */
+nav {
+    float: right;
+    margin-top: 10px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    color: #333;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+/* Content */
+.content {
+    padding: 20px;
+}
+
+.btn {
+    background-color: #33cc99;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.chat-block {
+    background-color: #f7f7f7;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.btn-create {
+    background-color: #33cc99;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
