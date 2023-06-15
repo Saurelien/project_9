@@ -27,8 +27,11 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('ticket')  # Redirige vers la page des tickets SI la connexion REUSSIT
-    return render(request, 'authenticator/skeleton.html')
+            print(User.objects.all())
+            return redirect('flux')  # Redirige vers la page des tickets SI la connexion REUSSIT
+        else:
+            return render(request, 'skeleton.html', {'erreurs': 'Identifiants invalides'})
+    return render(request, 'skeleton.html')
 
 
 def get_all_info():

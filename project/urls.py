@@ -20,11 +20,13 @@ from django.urls import path
 from authenticator import views
 # importe la vue du projet pour une page d'acceuille
 from project.views import skeleton_view
+# from review.views import get_flux_data
 
 
 urlpatterns = [
-    path('user_login', views.user_login, name='user_login'),
+    path('user_login/', views.user_login, name='user_login'),
     path('', skeleton_view, name='skeleton'),
     path('admin/', admin.site.urls),
     path('register/', views.register, name='register'),
+    # path('flux/', views.flux, name='flux')
 ]
