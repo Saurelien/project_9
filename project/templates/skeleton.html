@@ -2,6 +2,7 @@
 <html>
 {% load static %}
 <head>
+    <!-- Test html django -->
     <title>{% block title %}LiteReview{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'skeleton/skeleton.css' %}">
 </head>
@@ -15,6 +16,7 @@
             <a href="/register" class="register-button">S'inscrire</a>
         </div>
         <div class="block">
+            <form class="login-form" action="" method="POST"></form>
             <h2 class="block-title">Connectez-vous</h2>
             <form class="login-form">
                 <label for="username">Nom d'utilisateur</label>
@@ -32,3 +34,4 @@
     </script>
 </body>
 </html>
+

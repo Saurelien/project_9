@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, User
 
 
 class RegistrationForm(UserCreationForm):
@@ -10,11 +10,14 @@ class RegistrationForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        username = cleaned_data.get('username')
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("La confirmation du mot de passe ne correspond pas à la saisie du mot de passe.")
+            raise forms.ValidationError("La confirmation du mot de passe ne correspond pas à la saisie du mot de passe")
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Ce nom d'utilisateur est déjà utilisé !")
 
         return cleaned_data
 

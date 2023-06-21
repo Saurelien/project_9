@@ -24,7 +24,7 @@ from project.views import skeleton_view
 
 
 urlpatterns = [
-    path('user_login/', views.user_login, name='user_login'),
+    path('login/', views.user_login, name='login'),
     path('', skeleton_view, name='skeleton'),
     path('admin/', admin.site.urls),
     path('register/', views.register, name='register'),

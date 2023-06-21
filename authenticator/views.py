@@ -9,7 +9,7 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             print("Le formulaire est validé")
-            user = form.save()
+            form.save()
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
             authenticated_user = authenticate(request, username=username, password=password)
@@ -37,7 +37,7 @@ def user_login(request):
 def get_all_info():
     users = User.objects.all()
     for user in users:
-        print(f"Username: {user.username}, Password : {user.password1}")
+        print(f"Username: {user.username}")
 
 
 def user_logout(request):
