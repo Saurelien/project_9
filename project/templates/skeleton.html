@@ -28,10 +28,5 @@
             </form>
         </div>
     </div>
-    <script>
-        {% if not user.is_authenticated %}
-            window.location.replace("{% url 'register' %}");
-        {% endif %}
-    </script>
 </body>
 </html>

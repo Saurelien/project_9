@@ -27,7 +27,7 @@ class RegistrationForm(UserCreationForm):
 class RegisterView(FormView):
     template_name = 'authenticator/register.html'
     form_class = RegistrationForm
-    success_url = '/login'
+    success_url = '/login/'
 
     def form_valid(self, form):
         form.save()
@@ -52,5 +52,3 @@ class ListAllUser(ListView):
     model = User
     template_name = 'authenticator/user_list.html'
     context_object_name = 'users'
-    if model != model:
-        print("Pas d'utilisateur encore inscrit ! ")
