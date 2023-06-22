@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, User, AuthenticationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 from django.views.generic import FormView, ListView
 
 
@@ -16,8 +16,10 @@ class RegistrationForm(UserCreationForm):
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
+        # Vérifie la concordance des mots de passe
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("La confirmation du mot de passe ne correspond pas à la saisie du mot de passe")
+        # Vérifier si le nom d'utilisateur est déjà utilisé
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("Ce nom d'utilisateur est déjà utilisé !")
 
@@ -31,10 +33,6 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         form.save()
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password1')
-        authenticated_user = authenticate(request=self.request, username=username, password=password)
-        login(self.request, authenticated_user)
         return super().form_valid(form)
 
 
