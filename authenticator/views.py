@@ -1,45 +1,56 @@
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
-from .models import RegistrationForm
-from django.contrib.auth.models import User
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, User, AuthenticationForm
+from django.contrib.auth import authenticate, login
+from django.views.generic import FormView, ListView
 
 
-def register(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            print("Le formulaire est validé")
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            authenticated_user = authenticate(request, username=username, password=password)
-            login(request, authenticated_user)
-            return redirect('skeleton')
-    else:
-        form = RegistrationForm()
-    return render(request, 'authenticator/register.html', {'form': form})
+class RegistrationForm(UserCreationForm):
+    username = forms.CharField(label="Nom d'utilisateur *", error_messages={'required': "Veuillez remplir ce champ*"})
+    password1 = forms.CharField(label="Mot de passe *", error_messages={'required': "Veuillez remplir ce champ*"})
+    password2 = forms.CharField(label="Confirmez le mot de passe *",
+                                error_messages={'required': "Veuillez remplir ce champ*"})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("La confirmation du mot de passe ne correspond pas à la saisie du mot de passe")
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Ce nom d'utilisateur est déjà utilisé !")
+
+        return cleaned_data
 
 
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            print(User.objects.all())
-            return redirect('flux')  # Redirige vers la page des tickets SI la connexion REUSSIT
-        else:
-            return render(request, 'skeleton.html', {'erreurs': 'Identifiants invalides'})
-    return render(request, 'skeleton.html')
+class RegisterView(FormView):
+    template_name = 'authenticator/register.html'
+    form_class = RegistrationForm
+    success_url = '/login'
+
+    def form_valid(self, form):
+        form.save()
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password1')
+        authenticated_user = authenticate(request=self.request, username=username, password=password)
+        login(self.request, authenticated_user)
+        return super().form_valid(form)
 
 
-def get_all_info():
-    users = User.objects.all()
-    for user in users:
-        print(f"Username: {user.username}")
+class LoginView(FormView):
+    template_name = 'authenticator/login.html'
+    form_class = AuthenticationForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return super().form_valid(form)
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('login')
+class ListAllUser(ListView):
+    model = User
+    template_name = 'authenticator/user_list.html'
+    context_object_name = 'users'
+    if model != model:
+        print("Pas d'utilisateur encore inscrit ! ")

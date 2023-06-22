@@ -17,16 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # import les vues de l'app authenticator
-from authenticator import views
 # importe la vue du projet pour une page d'acceuille
-from project.views import skeleton_view
-# from review.views import get_flux_data
+from .views import skeleton_view
+from authenticator.views import RegisterView, LoginView, ListAllUser
+# from review.views import FluxView
 
+app_name = 'authenticator'
 
 urlpatterns = [
-    path('login/', views.user_login, name='login'),
     path('', skeleton_view, name='skeleton'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('users/', ListAllUser.as_view(), name='user_list'),
+    # path('flux/', FluxView.as_view(), name='flux')
     path('admin/', admin.site.urls),
-    path('register/', views.register, name='register'),
-    # path('flux/', views.flux, name='flux')
 ]
