@@ -1,8 +1,10 @@
-from django import forms
 from django.contrib.auth.forms import UserCreationForm, User, AuthenticationForm
-from django.contrib.auth import login
-from django.views.generic import FormView, ListView
+from django.contrib.auth import login, logout
+from django.views.generic import FormView, ListView, RedirectView
 
+
+"""
+Compréhension de la méthode generique de UserCreationForm & AuthenticationForm:
 
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(label="Nom d'utilisateur *", error_messages={'required': "Veuillez remplir ce champ*"})
@@ -24,26 +26,56 @@ class RegistrationForm(UserCreationForm):
             raise forms.ValidationError("Ce nom d'utilisateur est déjà utilisé !")
 
         return cleaned_data
+        
+class LoginView(DjangoLoginView):
+    template_name = 'authenticator/login.html'
+    form_class = AuthenticationForm
+    success_url = '/flux/'
+
+    def post_user(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            # Verifier si l'utilisateur est inscrit
+            if user is not None:
+                login(request, user)
+                return redirect(self.success_url)
+            else:
+                messages.error(request, "Vous devez être inscrit pour vous connecter.")
+
+        return self.form_invalid(form)
+        
+"""
 
 
 class RegisterView(FormView):
     template_name = 'authenticator/register.html'
-    form_class = RegistrationForm
-    success_url = '/login/'
+    form_class = UserCreationForm
+    success_url = '/'
 
     def form_valid(self, form):
         form.save()
-        return super().form_valid(form)
+        return super(RegisterView, self).form_valid(form)
 
 
 class LoginView(FormView):
-    template_name = 'authenticator/login.html'
+    template_name = 'authenticator/flux.html'
     form_class = AuthenticationForm
-    success_url = '/'
+    success_url = '/flux/'
 
     def form_valid(self, form):
         login(self.request, form.get_user())
         return super().form_valid(form)
+
+
+class LogoutUserView(RedirectView):
+    next_page = 'skeleton'
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)
 
 
 class ListAllUser(ListView):

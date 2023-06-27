@@ -17,12 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from project.views import skeleton_view
-from authenticator.views import RegisterView, LoginView, ListAllUser
+from authenticator.views import RegisterView, LoginView,LogoutUserView,  ListAllUser
+
+
+app_name = 'authenticator'
 
 urlpatterns = [
     path('', skeleton_view, name='skeleton'),  # Page d'accueil
     path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('flux/', LoginView.as_view(), name='flux'),
+    path('', LogoutUserView.as_view(next_page='skeleton'), name='logout'),
     path('users/', ListAllUser.as_view(), name='user_list'),
     path('admin/', admin.site.urls),
 ]

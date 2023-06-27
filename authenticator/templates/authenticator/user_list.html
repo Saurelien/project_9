@@ -7,11 +7,11 @@
 <body>
     <h2>Liste des utilisateurs</h2>
     <ul>
-      {% for user in users %}
-        <li>
-            <p> Nom d'utilisateur: {{ user.username }} Mot de passe HEX: {{ user.password }}</p>
-        </li>
-      {% endfor %}
+        {% if user.is_authenticated %}
+            <li>
+                <p> Nom d'utilisateur: {{ user.username }}</p>
+            </li>
+        {% endif%}
     </ul>
 </body>
 </html>

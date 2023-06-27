@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
     <title>Flux - LiteReview</title>
-    <link rel="stylesheet" type="text/css" href="skeleton.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'flux/flux.css' %}">
 </head>
 <body>
     <header>
@@ -12,7 +13,15 @@
                 <li><a href="#">Flux</a></li>
                 <li><a href="#">Posts</a></li>
                 <li><a href="#">Abonnements</a></li>
-                <li><a href="#">Se déconnecter</a></li>
+                <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <span class="username {% if user.is_authenticated %} connected{% endif %}">
+                        Utilisateur: {{ user.username }}</span><span class="status-dot">
+
+                        </span>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     </header>

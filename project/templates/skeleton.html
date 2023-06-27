@@ -10,23 +10,28 @@
     <h1 class="title">LiteReview</h1>
 
     <div class="container">
-        <div class="block">
-            <h2 class="block-title">Inscrivez-vous maintenant</h2>
-            <p>Texte et contenu du premier bloc</p>
-            <a href="/register" class="register-button">S'inscrire</a>
-        </div>
-        <div class="block">
-            <form class="login-form" action="" method="POST"></form>
-            <h2 class="block-title">Connectez-vous</h2>
-            <form class="login-form">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" id="username" name="username">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="password">
-                <button type="submit" class="login-button">Se connecter</button>
-                <a href="{% url 'user_list' %}" class="btn btn-primary">Afficher la liste des utilisateurs</a>
-            </form>
-        </div>
+            <div class="block">
+                <h2 class="block-title">Inscrivez-vous maintenant</h2>
+                <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+                <a href="/register" class="register-button">S'inscrire</a>
+            </div>
+            <div class="block">
+                <form class="login-form" action="{% url 'flux' %}" method="POST">
+                  {% csrf_token %}
+                  <h2 class="block-title">Connectez-vous</h2>
+                  <label for="username">Nom d'utilisateur</label>
+                  <input type="text" id="username" name="username">
+                  <label for="password">Mot de passe</label>
+                  <input type="password" id="password" name="password">
+                  <button type="submit" class="login-button">Se connecter</button>
+                  <a href="{% url 'user_list' %}" class="btn btn-primary">Afficher la liste des utilisateurs</a>
+                </form>
+            </div>
     </div>
 </body>
 </html>

@@ -52,6 +52,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+LOGIN_URL = "/"
+LOGIN_REDIRECT_URL = "/flux/"
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
