@@ -1,0 +1,12 @@
+{% block content %}
+  <h1>Résultats de la recherche</h1>
+  {% if users %}
+    {% for user in users %}
+    <div>{{ user.username }}</div>
+    {% empty %}
+    <div>Aucun utilisateur trouvé.</div>
+    {% endfor %}
+  {% else %}
+    <p>Aucun utilisateur trouvé.</p>
+  {% endif %}
+{% endblock %}

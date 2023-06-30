@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, User, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.views.generic import FormView, ListView, RedirectView
+from django.contrib.auth.views import LogoutView
 
 
 """
@@ -70,15 +71,27 @@ class LoginView(FormView):
         return super().form_valid(form)
 
 
-class LogoutUserView(RedirectView):
+class LogoutUserView(LogoutView):
     next_page = 'skeleton'
 
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        return super().get(request, *args, **kwargs)
+    # def get(self, request, *args, **kwargs):
+    #     logout(request)
+    #     return super().get(request, *args, **kwargs)
 
 
 class ListAllUser(ListView):
     model = User
     template_name = 'authenticator/user_list.html'
     context_object_name = 'users'
+
+# TODO Faire en sorte que le template skeleton_user_online affiche uniquement la page d'accueil pour un utilisateur
+#  authentifié, un block contenant :
+#     {% if user.is_authenticated %}
+#         <div class="block">
+#             <h2 class="block-title">Bienvenue, {{ user.username }}</h2>
+#             <a href="{% url 'flux' %}" class="flux-link">Accéder au flux</a>
+#             <a href="{% url 'authenticator:logout' %}" class="logout-button">Se déconnecter</a>
+#             <a href="{% url 'authenticator:user_list' %}" class="btn btn-primary">Afficher la liste des utilisateurs</a>
+#         </div>
+#     {% else %}
+

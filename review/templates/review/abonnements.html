@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>Abonnements - LiteReview</title>
+<!--    <link rel="stylesheet" type="text/css" href="{% static 'flux/flux.css' %}">-->
+</head>
+<body>
+    <header>
+        <h1 class="title">LiteReview</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'flux' %}">Flux</a></li>
+                <li><a href="#">Posts</a></li>
+                <li><a href="#">Abonnements</a></li>
+                <li><a href="{% url 'skeleton' %}">Se déconnecter</a></li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <span class="username connected">
+                            Utilisateur: {{ user.username }}
+                        </span>
+                        <span class="status-dot"></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h2 class="block-title">Mes abonnements</h2>
+    <form id="search-form">
+      <input type="text" id="search-input" name="search" placeholder="Rechercher un utilisateur">
+    </form>
+
+<div id="search-results"></div>
+
+        <h3 class="sub-title">Utilisateurs suivis</h3>
+        {% if abonnements %}
+            <ul class="utilisateurs-suivis">
+                {% for abonnement in abonnements %}
+                    <li>{{ abonnement.followed_user.username }} <button class="btn-desabonner">Se désabonner</button></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Vous ne suivez aucun utilisateur pour le moment.</p>
+        {% endif %}
+
+        <h3 class="sub-title">Utilisateurs abonnés</h3>
+        {% if abonnes %}
+            <ul class="utilisateurs-abonnes">
+                {% for abonne in abonnes %}
+                    <li>{{ abonne.follower.username }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucun utilisateur ne vous suit pour le moment.</p>
+        {% endif %}
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let searchInput = document.getElementById('search-input');
+        let searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function(event) {
+          let query = event.target.value;
+          if (query.length >= 3) {
+            axios.get('/recherche_utilisateur/', {
+              params: { q: query }
+            })
+            .then(function(response) {
+              searchResults.innerHTML = response.data;
+            })
+            .catch(function(error) {
+              console.error(error);
+            });
+          } else {
+            searchResults.innerHTML = '';
+          }
+        });
+      });
+    </script>
+</body>
+</html>

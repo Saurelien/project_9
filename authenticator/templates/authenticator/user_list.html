@@ -7,11 +7,11 @@
 <body>
     <h2>Liste des utilisateurs</h2>
     <ul>
-        {% if user.is_authenticated %}
+        {% for user in users %}
             <li>
                 <p> Nom d'utilisateur: {{ user.username }}</p>
             </li>
-        {% endif%}
+        {% endfor%}
     </ul>
 </body>
 </html>

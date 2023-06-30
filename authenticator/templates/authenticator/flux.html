@@ -12,8 +12,8 @@
             <ul>
                 <li><a href="#">Flux</a></li>
                 <li><a href="#">Posts</a></li>
-                <li><a href="#">Abonnements</a></li>
-                <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                <li><a href="{% url 'abonnements' %}">Abonnements</a></li>
+                <a href="{% url 'logout' %}" class="logout-link">Se déconnecter</a>
                 {% if user.is_authenticated %}
                     <li>
                         <span class="username {% if user.is_authenticated %} connected{% endif %}">
