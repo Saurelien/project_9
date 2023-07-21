@@ -1,10 +1,15 @@
-<!--Formulaire de création pour une critique-->
-<form method="POST" action="{% url 'create_ticket' %}">
-    {% csrf_token %}
-    <label for="contenu">Contenu de la critique :</label>
-    <textarea id="contenu" name="contenu"></textarea>
-    <button type="submit">Envoyer</button>
-</form>
+{% extends 'skeleton.html' %}
+
+    {% block page_title %} Créer un ticket {% endblock page_title %}
+
+{% block content %}
+    <h2>Créer un nouveau ticket</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Créer le ticket</button>
+    </form>
+{% endblock %}
 
 
 

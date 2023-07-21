@@ -1,14 +1,9 @@
 {% extends 'skeleton.html' %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        <div class="block">
-            <h2 class="block-title">Bienvenue, {{ user.username }}</h2>
-            <a href="{% url 'flux' %}" class="flux-link">Accéder au flux</a>
-            <a href="{% url 'authenticator:logout' %}" class="logout-button">Se déconnecter</a>
-            <a href="{% url 'authenticator:user_list' %}" class="btn btn-primary">Afficher la liste des utilisateurs</a>
-        </div>
-    {% else %}
+    <h1 class="title" style="font-size: 50px;">LiteReview</h1>
+
+    <div class="container">
         <div class="block">
             <h2 class="block-title">Inscrivez-vous maintenant</h2>
             <p>
@@ -20,7 +15,7 @@
             <a href="/register" class="register-button">S'inscrire</a>
         </div>
         <div class="block">
-            <form class="login-form" action="{% url 'flux' %}" method="POST">
+            <form class="login-form" action="" method="POST">
                 {% csrf_token %}
                 <h2 class="block-title">Connectez-vous</h2>
                 <label for="username">Nom d'utilisateur</label>
@@ -31,5 +26,5 @@
                 <a href="{% url 'user_list' %}" class="btn btn-primary">Afficher la liste des utilisateurs</a>
             </form>
         </div>
-    {% endif %}
-{% endblock %}
+    </div>
+{% endblock content %}

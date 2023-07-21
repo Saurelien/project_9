@@ -16,21 +16,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from project.views import skeleton_view, SkeletonUserOnlineView
-from authenticator.views import RegisterView, LoginView, LogoutUserView, ListAllUser
-from review.views import AbonnementView, SearchUserView
+from authenticator.views import RegisterView, LogoutUserView, ListAllUser, LoginView
+from review.views import SearchUserView, FluxView, FollowUserView, TicketCreateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 app_name = 'authenticator'
 
 urlpatterns = [
-    path('', skeleton_view, name='skeleton'),
+    path('', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('flux/', LoginView.as_view(), name='flux'),
+    path('flux/', FluxView.as_view(), name='flux'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
-    path('abonnements/', AbonnementView.as_view(), name='abonnements'),
     path('recherche_utilisateur/', SearchUserView.as_view(), name='recherche_utilisateur'),
-    path('skeleton_user_online/', SkeletonUserOnlineView.as_view(), name='skeleton_user_online'),
+    path('abonnements/', FollowUserView.as_view(), name='flux_utilisateurs'),
     path('users/', ListAllUser.as_view(), name='user_list'),
+    path('create_ticket/', TicketCreateView.as_view(), name='create_ticket'),
     path('admin/', admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

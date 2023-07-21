@@ -1,0 +1,27 @@
+{% extends 'skeleton.html' %}
+
+    {% block page_title %} Abonnements {% endblock page_title %}
+
+{% block content %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn" type="submit" value="Suivre">
+
+    </form>
+    <h1>Utilisateurs suivis</h1>
+
+    <ul>
+        {% for s_user in utilisateurs_suivis %}
+            <li>{{s_user.followed_user.username}}</li>
+        {% endfor %}
+    </ul>
+
+    <h1>Utilisateurs abonnés</h1>
+
+    <ul>
+        {% for f_user in abonnes %}
+            <li>{{f_user.follower.username}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

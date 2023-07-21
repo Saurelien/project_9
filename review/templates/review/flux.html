@@ -1,0 +1,22 @@
+{% extends 'skeleton.html' %}
+
+{% block content %}
+    <div class="content">
+        <button class="btn">Demander une critique</button>
+        <a href="{% url 'create_ticket' %}" class="btn">Créer une critique</a>
+
+        <div class="post-block">
+            <h2>Mes critiques</h2>
+                <ul>
+                    {% for ticket in user.ticket_set.all %}
+                        <li>
+                            {{ user.username}} à publié une critique:
+                            <strong>{{ ticket.title }}</strong>
+                            <p>{{ ticket.description }}</p>
+                            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+                        </li>
+                    {% endfor %}
+                </ul>
+        </div>
+    </div>
+{% endblock content %}
