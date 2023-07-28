@@ -1,0 +1,21 @@
+/* Change la couleur de fond du menu de navigation */
+#header {
+    background-color: #222;
+}
+
+/* Change la couleur des liens du menu de navigation */
+#header .menu a {
+    color: #fff;
+}
+
+/* Change la couleur de fond des boutons */
+.button {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Change la couleur des messages d'erreur */
+.messages .error {
+    background-color: #a00;
+    color: #fff;
+}

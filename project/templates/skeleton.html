@@ -10,9 +10,14 @@
     <nav>
         <ul>
             <li><a href="{% url 'flux' %}">Flux</a></li>
-            <li><a href="#">Posts</a></li>
+            <li><a href="{% url 'posts' %}">Posts</a></li>
             <li><a href="{% url 'flux_utilisateurs' %}">Abonnements</a></li>
-            <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+            {% endif %}
+            {% if request.user.is_superuser %}
+                <a href="{% url 'admin:index' %}" class="btn">Espace admin</a>
+            {% endif %}
             {% if user.is_authenticated %}
                 <li>
                     <span class="username connected">

@@ -1,27 +1,30 @@
 {% extends 'skeleton.html' %}
 
-    {% block page_title %} Abonnements {% endblock page_title %}
+{% block page_title %} Abonnements {% endblock page_title %}
 
 {% block content %}
-    <form action="" method="POST">
+    <form method="POST" action="{% url 'subscribe_user' %}">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input class="btn" type="submit" value="Suivre">
-
+        <input type="text" name="username" placeholder="Rechercher un utilisateur">
+        <button type="submit">S'abonner</button>
     </form>
     <h1>Utilisateurs suivis</h1>
-
     <ul>
         {% for s_user in utilisateurs_suivis %}
-            <li>{{s_user.followed_user.username}}</li>
+            <li>
+                {{ s_user.followed_user.username }}
+                <form method="post" action="{% url 'unfollow_user' s_user.followed_user.username %}">
+                    {% csrf_token %}
+                    <button type="submit">Se désabonner</button>
+                </form>
+            </li>
         {% endfor %}
     </ul>
 
     <h1>Utilisateurs abonnés</h1>
-
     <ul>
         {% for f_user in abonnes %}
-            <li>{{f_user.follower.username}}</li>
+            <li>{{ f_user.follower.username }}</li>
         {% endfor %}
     </ul>
 {% endblock %}

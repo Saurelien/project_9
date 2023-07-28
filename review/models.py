@@ -1,6 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class Ticket(models.Model):
@@ -20,7 +21,11 @@ class Ticket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    note = models.PositiveSmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
+
+    def get_absolute_url(self):
+        return reverse('update_ticket', args=[str(self.pk)])
 
     def __str__(self):
         return self.title
@@ -48,3 +53,25 @@ class UserFollows(models.Model):
 
     def __str__(self):
         return f'{self.follower} follows {self.followed_user}'
+
+
+class PrivateMessage(models.Model):
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.subject
+
+
+class TicketReplyNotification(models.Model):
+    ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification for ticket: {self.ticket}"

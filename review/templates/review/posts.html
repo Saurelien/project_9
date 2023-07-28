@@ -1,0 +1,29 @@
+{% extends 'skeleton.html' %}
+
+{% block content %}
+    <div class="content">
+        <button class="btn">Demander une critique</button>
+        <a href="{% url 'create_ticket' %}" class="btn">Créer une critique</a>
+        <div class="post-block">
+            <h2>Mes Tickets</h2>
+                <ul>
+                    {% for ticket in user.ticket_set.all %}
+                        <li>
+                            {{ user.username}} à publié une critique:
+                            <br>
+                            <p>Titre du Ticket: <strong>{{ ticket.title }}</strong></p>
+                            <p>Description: {{ ticket.description }}</p>
+                            <I>Date de création: {{ ticket.created_at }}</I>
+                            <br>
+                            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+                            <br>
+                            <I>Note: {{ ticket.note }} </I>
+                            <br>
+                            <a href="{% url 'update_ticket' ticket.pk %}" class="btn">Modifier</a>
+                            <a href="{% url 'posts' %}" class="btn">Supprimer</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+        </div>
+    </div>
+{% endblock content %}

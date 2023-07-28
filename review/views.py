@@ -1,73 +1,57 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django import forms
-from django.views.generic.edit import FormView
+from .forms import FollowUserForm, TicketForm, TicketUpdateForm
+from django.views.generic.edit import FormView, UpdateView
 from review.models import UserFollows
-from django.shortcuts import get_object_or_404, reverse
-from django.views.generic.base import RedirectView
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import TemplateView  # ListView
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
 from django.views.generic.base import View
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import Ticket
-from django.shortcuts import redirect
+from django.contrib import messages
+from django import forms
 
 UserModel = get_user_model()
-
-# class AbonnementView(TemplateView):
-#     template_name = 'review/abonnements.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#
-#         # Récupérer l'utilisateur suivi depuis la session
-#         utilisateur_suivi = self.request.session.get('utilisateur_suivi')
-#
-#         if utilisateur_suivi:
-#             # Récupérer les abonnés de l'utilisateur suivi
-#             abonnes = User.objects.filter(utilisateurs_suivis__username=utilisateur_suivi)
-#
-#             # Récupérer les utilisateurs suivis par l'utilisateur actuel
-#             utilisateurs_suivis = User.objects.filter(abonnes=self.request.user)
-#
-#             # Ajouter les utilisateurs suivis et les abonnés au contexte
-#             context['utilisateurs_suivis'] = utilisateurs_suivis
-#             context['abonnes'] = abonnes
-#
-#         return context
-
-# class SearchUserView(LoginRequiredMixin, View):
-#     def get(self, request):
-#         data = []
-#         query = request.GET.get('q')
-#         if query is None or len(query) < 3:
-#             return JsonResponse(data, safe=False)
-#         users = User.objects.filter(username__startswith=query)
-#         for user in users:
-#             data.append({"id": user.pk, "username": user.username})
-#
-#         return JsonResponse(data, safe=False)
 
 
 class FluxView(LoginRequiredMixin, TemplateView):
     template_name = 'review/flux.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class SearchUserView(LoginRequiredMixin, View):
-    def get(self, request):
-        query = request.GET.get('q')
-        if query and len(query) >= 3:
-            users = UserModel.objects.filter(username__startswith=query)
-        else:
-            users = []
+        # Récupérer les utilisateurs suivis par l'utilisateur connecté
+        utilisateurs_suivis = self.request.user.following.all()
 
-        context = {'users': users}
-        return render(request, 'review/recherche_utilisateur.html', context)
+        # Ajouter les utilisateurs suivis au contexte
+        context['utilisateurs_suivis'] = utilisateurs_suivis
+
+        return context
 
 
-class FollowUserForm(forms.Form):
-    username = forms.CharField()
+class PostsView(LoginRequiredMixin, TemplateView):
+    template_name = 'review/posts.html'
+
+
+class SubscribeUserView(View):
+    def post(self, request):
+        username = request.POST.get('username')
+        if username:
+            # Recherche de l'utilisateur à suivre
+            user_to_follow = UserModel.objects.filter(username=username).first()
+
+            # S'assurer que l'utilisateur existe avant de le suivre
+            if user_to_follow:
+                # Vérifier si la relation de suivi existe déjà
+                if not UserFollows.objects.filter(follower=request.user, followed_user=user_to_follow).exists():
+                    # Créer la relation de suivi
+                    UserFollows.objects.create(follower=request.user, followed_user=user_to_follow)
+                    messages.success(request, f"Vous suivez maintenant {user_to_follow.username}.")
+                else:
+                    messages.error(request, f"Vous suivez déjà {user_to_follow.username}.")
+
+        return redirect('flux_utilisateurs')
 
 
 class FollowUserView(LoginRequiredMixin, FormView):
@@ -96,41 +80,62 @@ class FollowUserView(LoginRequiredMixin, FormView):
 """ Classe prototype pour le systeme d'abonnement utilisateur"""
 
 
-class UnfollowUserView(LoginRequiredMixin, RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        # Récupérer l'utilisateur à ne plus suivre
-        username = self.kwargs.get('username')
+class UnfollowUserView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        username = kwargs.get('username')
         followed_user = get_object_or_404(UserModel, username=username)
 
-        # Supprimer la relation de suivi entre l'utilisateur connecté et l'utilisateur suivi
-        UserFollows.objects.filter(follower=self.request.user, followed_user=followed_user).delete()
+        # Vérifiez si la relation de suivi existe avant de la supprimer
+        try:
+            follow_relation = UserFollows.objects.get(follower=request.user, followed_user=followed_user)
+            follow_relation.delete()
+        except UserFollows.DoesNotExist:
+            pass
 
-        # Rediriger l'utilisateur vers une page appropriée (par exemple, le profil de l'utilisateur suivi)
-        return reverse('user_profile', kwargs={'username': username})
+        # Rediriger l'utilisateur vers une page appropriée (par exemple, la liste des utilisateurs suivis)
+        return redirect('flux_utilisateurs')
 
 
 """ Vue de la gestion des tickets """
 """ Consommation du model Ticket """
 
 
-class TicketForm(forms.ModelForm):
-    class Meta:
-        model = Ticket
-        fields = ['title', 'description', 'image']
-
-
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     template_name = 'review/create_ticket.html'
     form_class = TicketForm
-    success_url = reverse_lazy('flux')
+    success_url = reverse_lazy('posts')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        ticket_id = self.kwargs.get('ticket_id')
+        if ticket_id:
+            # Si un ticket_id est fourni dans l'URL, récupérez le ticket existant
+            ticket = get_object_or_404(Ticket, id=ticket_id)
+            # Pré-remplissez les champs du formulaire avec les valeurs du ticket existant
+            form.initial['title'] = ticket.title
+            form.initial['description'] = ticket.description
+            form.initial['image'] = ticket.image
+            # Masquer le champ "note" dans le formulaire car il sera géré séparément
+            form.fields['note'].widget = forms.HiddenInput()
+        return form
 
     def form_valid(self, form):
         form.instance.creator = self.request.user
         return super().form_valid(form)
 
+
+""" Mettre à jour ou supprimer le ticket """
+
+
+class TicketUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ticket
+    template_name = 'review/update_ticket.html'
+    form_class = TicketUpdateForm
+    success_url = '/posts/'
+
+
 # TODO
-#  1: Déplacer les class form dans un fichier forms.py
 #  2: Nettoyer les vues & templates inutilisé
 #  3: Permettre a un utilisateur de se désabonner d'un utilisateur suivis
 #  4: Mettre en place la page post qui contiendra les critiques lié au ticket créer

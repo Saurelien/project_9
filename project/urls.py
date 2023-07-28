@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from authenticator.views import RegisterView, LogoutUserView, ListAllUser, LoginView
-from review.views import SearchUserView, FluxView, FollowUserView, TicketCreateView
+from review.views import FluxView, FollowUserView, TicketCreateView, PostsView,\
+    UnfollowUserView, SubscribeUserView, TicketUpdateView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -29,10 +30,13 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('flux/', FluxView.as_view(), name='flux'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
-    path('recherche_utilisateur/', SearchUserView.as_view(), name='recherche_utilisateur'),
+    path('subscribe/', SubscribeUserView.as_view(), name='subscribe_user'),
     path('abonnements/', FollowUserView.as_view(), name='flux_utilisateurs'),
     path('users/', ListAllUser.as_view(), name='user_list'),
     path('create_ticket/', TicketCreateView.as_view(), name='create_ticket'),
+    path('posts/', PostsView.as_view(), name='posts'),
+    path('unfollow/<str:username>/', UnfollowUserView.as_view(), name='unfollow_user'),
+    path('ticket/<int:pk>/update/', TicketUpdateView.as_view(), name='update_ticket'),
     path('admin/', admin.site.urls),
 ]
 
