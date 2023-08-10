@@ -1,0 +1,19 @@
+{% extends 'skeleton.html' %}
+
+{% block content %}
+    <div class="content">
+        <h2>Notifications de réponses aux tickets</h2>
+        <ul>
+            {% for notification in ticket_notifications %}
+                <li>
+                    <p>Notification pour le ticket : {{ notification.ticket }}</p>
+                    {% if notification.ticket_reviewed %}
+                        <a href="{% url 'update_ticket' pk=notification.ticket.pk %}" class="btn">Voir le ticket</a>
+                    {% else %}
+                        <p>Ce ticket n'a pas encore été répondu.</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}

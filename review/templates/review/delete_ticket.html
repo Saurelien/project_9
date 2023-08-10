@@ -1,0 +1,19 @@
+{% extends 'skeleton.html' %}
+
+    {% block page_title %} Créer un ticket {% endblock page_title %}
+
+{% block content %}
+    <html>
+    <head>
+        <title>Confirmation de suppression du ticket</title>
+    </head>
+    <body>
+        <h1>Confirmer la suppression du ticket "{{ object.title }}"</h1>
+        <form method="post">
+            {% csrf_token %}
+            <input type="submit" value="Supprimer">
+        </form>
+        <a href="{% url 'flux' %}">Annuler</a>
+    </body>
+    </html>
+{% endblock %}

@@ -1,18 +1,42 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import FollowUserForm, TicketForm, TicketUpdateForm
-from django.views.generic.edit import FormView, UpdateView
-from review.models import UserFollows
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import TemplateView  # ListView
+from .forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm
+from django.views.generic.edit import FormView, UpdateView, CreateView
+from review.models import UserFollows, Review, Ticket
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
 from django.views.generic.base import View
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
-from .models import Ticket
 from django.contrib import messages
 from django import forms
+from django.views.generic import DeleteView
+from itertools import chain
+from django.db.models import CharField, Value
+from django.db.models import Q
+
 
 UserModel = get_user_model()
+
+
+def get_posts(users):
+    reviews = Review.objects.filter(user__in=users)
+    reviews = reviews.annotate(content_type=Value('CRITIQUE', CharField()))
+
+    # Utilisation de Q pour combiner des conditions de filtrage
+    tickets = Ticket.objects.filter(Q(creator__in=users) | Q(review__user__in=users))
+    tickets = tickets.annotate(content_type=Value('TICKET', CharField()))
+
+    # Obtenir toutes les critiques associées aux tickets des utilisateurs suivis
+    ticket_ids = tickets.values_list('id', flat=True)
+    associated_reviews = Review.objects.filter(ticket_id__in=ticket_ids)
+    associated_reviews = associated_reviews.annotate(content_type=Value('CRITIQUE', CharField()))
+
+    # Combiner et trier les trois types de posts
+    return sorted(
+        chain(reviews, tickets, associated_reviews),
+        key=lambda post: post.created_at,
+        reverse=True
+    )
 
 
 class FluxView(LoginRequiredMixin, TemplateView):
@@ -24,8 +48,11 @@ class FluxView(LoginRequiredMixin, TemplateView):
         # Récupérer les utilisateurs suivis par l'utilisateur connecté
         utilisateurs_suivis = self.request.user.following.all()
 
-        # Ajouter les utilisateurs suivis au contexte
-        context['utilisateurs_suivis'] = utilisateurs_suivis
+        # Créez une liste d'utilisateurs à partir des utilisateurs suivis
+        users = [user.followed_user for user in utilisateurs_suivis]
+
+        # Utiliser la fonction get_posts pour obtenir les posts des utilisateurs suivis
+        context['posts'] = get_posts(users)
 
         return context
 
@@ -33,8 +60,17 @@ class FluxView(LoginRequiredMixin, TemplateView):
 class PostsView(LoginRequiredMixin, TemplateView):
     template_name = 'review/posts.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = get_posts([self.request.user])
+        return context
+
 
 class SubscribeUserView(View):
+    """
+Définir une méthode comme statique (@staticmethod) dans une vue basée sur classe en Django n'est pas obligatoire et,
+ en fait, c'est généralement déconseillé pour les méthodes de traitement de requêtes HTTP comme post ou get.
+    """
     def post(self, request):
         username = request.POST.get('username')
         if username:
@@ -52,6 +88,9 @@ class SubscribeUserView(View):
                     messages.error(request, f"Vous suivez déjà {user_to_follow.username}.")
 
         return redirect('flux_utilisateurs')
+
+
+""" Classe prototype pour le systeme d'abonnement utilisateur"""
 
 
 class FollowUserView(LoginRequiredMixin, FormView):
@@ -75,9 +114,6 @@ class FollowUserView(LoginRequiredMixin, FormView):
         context['abonnes'] = self.request.user.followers.all()
 
         return context
-
-
-""" Classe prototype pour le systeme d'abonnement utilisateur"""
 
 
 class UnfollowUserView(LoginRequiredMixin, View):
@@ -133,6 +169,56 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'review/update_ticket.html'
     form_class = TicketUpdateForm
     success_url = '/posts/'
+
+
+class TicketDeleteView(DeleteView):
+    model = Ticket
+    # Redirige vers la page flux après la suppression du ticket
+    success_url = reverse_lazy('posts')
+    # Créez ce template pour demander confirmation à l'utilisateur avant de supprimer le ticket
+    template_name = 'review/delete_ticket.html'
+
+    def delete(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        print(f"Le ticket '{ticket.title}' a été supprimé le {ticket.created_at} par {request.user}")
+        messages.success(request, f"Le ticket '{ticket.title}' a été supprimé avec succès.")
+        return super().delete(request, *args, **kwargs)
+
+
+""" Vues creation et mise à jour des critiques """
+
+
+class CreateReviewView(LoginRequiredMixin, CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = 'review/create_review.html'
+    success_url = reverse_lazy('flux')  # Mettez l'URL de redirection souhaitée après la création de la critique
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_id = self.kwargs.get('ticket_id')
+        ticket = get_object_or_404(Ticket, id=ticket_id)
+        context['ticket'] = ticket
+        return context
+
+    def form_valid(self, form):
+        ticket_id = self.kwargs.get('ticket_id')
+        ticket = Ticket.objects.filter(id=ticket_id).first()
+
+        if ticket:
+            form.instance.ticket = ticket
+            form.instance.user = self.request.user
+            return super().form_valid(form)
+        else:
+            messages.error(self.request, "Le ticket spécifié n'existe pas.")
+            return redirect('flux')
+
+
+class UpdateReviewView(LoginRequiredMixin, UpdateView):
+    model = Review
+    template_name = 'review/update_review.html'
+    form_class = ReviewForm
+    success_url = '/flux/'
 
 
 # TODO

@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from authenticator.views import RegisterView, LogoutUserView, ListAllUser, LoginView
 from review.views import FluxView, FollowUserView, TicketCreateView, PostsView,\
-    UnfollowUserView, SubscribeUserView, TicketUpdateView
+    UnfollowUserView, SubscribeUserView, TicketUpdateView, TicketDeleteView, CreateReviewView, UpdateReviewView
+from messagesbox.views import PrivateMessageView, SendPrivateMessageView, TicketReplyNotificationsView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -37,6 +38,12 @@ urlpatterns = [
     path('posts/', PostsView.as_view(), name='posts'),
     path('unfollow/<str:username>/', UnfollowUserView.as_view(), name='unfollow_user'),
     path('ticket/<int:pk>/update/', TicketUpdateView.as_view(), name='update_ticket'),
+    path('private_messages/', PrivateMessageView.as_view(), name='private_messages'),
+    path('send_private_message/', SendPrivateMessageView.as_view(), name='send_private_message'),
+    path('notifications/', TicketReplyNotificationsView.as_view(), name='notifications'),
+    path('ticket/<int:pk>/delete/', TicketDeleteView.as_view(), name='delete_ticket'),
+    path('create_review/<int:ticket_id>/', CreateReviewView.as_view(), name='create_review'),
+    path('review/<int:pk>/update', UpdateReviewView.as_view(), name='update_review'),
     path('admin/', admin.site.urls),
 ]
 

@@ -1,22 +1,40 @@
 {% extends 'skeleton.html' %}
 
 {% block content %}
-        <div class="post-block">
-            <h2>Votre flux</h2>
-            <ul>
-                {% for s_user in utilisateurs_suivis %}
-                    {% for ticket in s_user.followed_user.ticket_set.all %}
-                        <li>
-                            <strong>{{ s_user.followed_user.username }} </strong><I>a publié un Ticket !</I>
-                            <br>
-                            <I>Titre du Tickket: <strong>{{ ticket.title }}</strong></I>
-                            <br>
-                                <I>Date de création: <strong>{{ ticket.created_at }}</strong></I>
-                                <p>Description: <strong>{{ ticket.description }}</strong></p>
-                            <img src="{{ ticket.image.url }}" alt="Ticket Image">
-                        </li>
-                    {% endfor %}
+<div class="post-block">
+    <h2 class="scrollable-title">Votre flux</h2>
+    <div class="scrollable-content">
+        {% for post in posts %}
+            {% if post.content_type == 'TICKET' %}
+                <div class="ticket-block">
+                    <h3>Titre du ticket: {{ post.title }}</h3>
+                    <p>Description: {{ post.description }}</p>
+                    <p>Createur du ticket: {{ post.creator }}</p>
+                    <img src="{{ post.image.url }}" alt="Ticket Image">
+                    <p>{{ post.created_at }}</p>
+                    <a href="{% url 'create_review' post.id %}">Répondre à ce ticket</a>
+                </div>
+                {% for critique_post in posts %}
+                    {% if critique_post.content_type == 'CRITIQUE' %}
+                        <div class="critique-block">
+                            <h4>Titre de la critique: {{ critique_post.title }}</h4>
+                            <p>Auteur de la critique: {{ critique_post.user.username }}</p>
+                            <p>Description de la critique: {{ critique_post.description }}</p>
+                            <p>Date de création de la critique: {{ critique_post.created_at }}</p>
+                            <p>Score de la critique: {{ critique_post.get_star_rating }}</p>
+                            <div class="ticket-details">
+                                <h4>Détails du ticket associé</h4>
+                                <p>Titre du ticket: {{ post.title }}</p>
+                                <p>Description du ticket: {{ post.description }}</p>
+                                <p>Createur du ticket: {{ post.creator }}</p>
+                                <img src="{{ post.image.url }}" alt="Ticket Image">
+                                <p>{{ post.created_at }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
-            </ul>
-        </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}

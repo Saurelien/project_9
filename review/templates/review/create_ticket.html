@@ -7,22 +7,6 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <div class="starability-basic" style="display: inline-block;">
-            <input type="radio" id="rate5" name="note" value="5">
-            <label for="rate5" title="5 étoiles">5 stars</label>
-
-            <input type="radio" id="rate4" name="note" value="4">
-            <label for="rate4" title="4 étoiles">4 stars</label>
-
-            <input type="radio" id="rate3" name="note" value="3">
-            <label for="rate3" title="3 étoiles">3 stars</label>
-
-            <input type="radio" id="rate2" name="note" value="2">
-            <label for="rate2" title="2 étoiles">2 stars</label>
-
-            <input type="radio" id="rate1" name="note" value="1">
-            <label for="rate1" title="1 étoile">1 star</label>
-        </div>
         <button type="submit">Créer le ticket</button>
     </form>
 {% endblock %}

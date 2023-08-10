@@ -3,27 +3,32 @@
 {% block content %}
     <div class="content">
         <button class="btn">Demander une critique</button>
-        <a href="{% url 'create_ticket' %}" class="btn">Créer une critique</a>
+        <a href="{% url 'create_ticket' %}" class="btn">Créer un Ticket</a>
         <div class="post-block">
-            <h2>Mes Tickets</h2>
-                <ul>
-                    {% for ticket in user.ticket_set.all %}
-                        <li>
-                            {{ user.username}} à publié une critique:
-                            <br>
-                            <p>Titre du Ticket: <strong>{{ ticket.title }}</strong></p>
-                            <p>Description: {{ ticket.description }}</p>
-                            <I>Date de création: {{ ticket.created_at }}</I>
-                            <br>
-                            <img src="{{ ticket.image.url }}" alt="Ticket Image">
-                            <br>
-                            <I>Note: {{ ticket.note }} </I>
-                            <br>
-                            <a href="{% url 'update_ticket' ticket.pk %}" class="btn">Modifier</a>
-                            <a href="{% url 'posts' %}" class="btn">Supprimer</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+            {% for post in posts %}
+                {% if post.content_type == 'TICKET' %}
+                    <h1>Ticket</h1>
+                    <p>Titre du ticket: {{ post.title }}</p>
+                    <p>Desccription: {{post.description }}</p>
+                    <p>Createur du ticket: {{ post.creator }}</p>
+                    <img src="{{ post.image.url }}" alt="Ticket Image">
+                    <p>{{ post.created_at }}</p>
+                    {% if post.creator == request.user %}
+                        <a href="{% url 'delete_ticket' post.id %}">Supprimer le ticket</a>
+                        <a href="{% url 'update_ticket' post.id %}">Modifier le ticket</a>
+                    {% endif %}
+                {% elif post.content_type == 'CRITIQUE' %}
+                    <h1>Critique</h1>
+                    <p>Titre de la critique: {{ post.ticket.title }}</p>
+                    <p>Auteur de la critique: {{ post.user.username }}</p>
+                    <p>Description de la critique: {{ post.ticket.description }}</p>
+                    <p>Date de création: {{ post.ticket.created_at }}</p>
+                    <p>Score du ticket: {{ post.get_star_rating }}</p>
+                    {% if post.user == request.user %}
+                    <a href="{% url 'update_review' post.id %}">Modifier la critique</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 {% endblock content %}

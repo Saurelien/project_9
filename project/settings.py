@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'authenticator',
     'review',
     'project',
+    'messagesbox',
 ]
 
 MIDDLEWARE = [

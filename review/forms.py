@@ -1,6 +1,5 @@
 from django import forms
-from .models import Ticket
-from .models import PrivateMessage
+from .models import Ticket, Review
 
 
 class FollowUserForm(forms.Form):
@@ -11,19 +10,19 @@ class TicketForm(forms.ModelForm):
 
     class Meta:
         model = Ticket
-        fields = ['title', 'description', 'image', 'note']
+        fields = ['title', 'description', 'image']
 
 
 class TicketUpdateForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ['title', 'description', 'image', 'note']
-        widgets = {
-            'body': forms.Textarea(attrs={'rows': 5}),
-        }
+        fields = ['title', 'description', 'image']
 
 
-class PrivateMessageForm(forms.ModelForm):
+class ReviewForm(forms.ModelForm):
     class Meta:
-        model = PrivateMessage
-        fields = ['recipient', 'subject', 'message']
+        model = Review
+        fields = ['title', 'description', 'rating']
+        widgets = {
+            'rating': forms.HiddenInput(),
+        }

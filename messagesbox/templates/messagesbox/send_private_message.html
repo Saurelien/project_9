@@ -1,0 +1,12 @@
+{% extends 'skeleton.html' %}
+
+{% block content %}
+    <div class="content">
+        <h2>Envoyer un message privé</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+{% endblock content %}
