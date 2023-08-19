@@ -1,7 +1,9 @@
 {% extends 'skeleton.html' %}
 
+{% block title %}Créer une critique{% endblock %}
+
 {% block content %}
-    <h2>Créer une critique pour le ticket "{{ ticket.title }}"</h2>
+    <h2>Créer une critique</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
@@ -17,14 +19,4 @@
 
         <input type="submit" value="Créer la critique">
     </form>
-    <br>
-        <p>------ Détails du Ticket ------</p>
-        <p>Titre du Ticket: <strong>{{ ticket.title }}</strong></p>
-        <p>Description du Ticket: {{ ticket.description }}</p>
-        <I>Date de création du Ticket: {{ ticket.created_at }}</I>
-        <br>
-        <img src="{{ ticket.image.url }}" alt="Ticket Image">
-        <br>
-        <I>Note: {{ ticket.note }} </I>
-
 {% endblock content %}

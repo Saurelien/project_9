@@ -1,16 +1,10 @@
 {% extends 'skeleton.html' %}
 
+    {% block title %}Mettre à jour une critique{% endblock %}
+
 {% block content %}
-    <h2>Modifier la critique</h2>
-        <br>
-        <p>------ Détails du Ticket ------</p>
-        <p>Titre du Ticket: <strong>{{ ticket.title }}</strong></p>
-        <p>Description du Ticket: {{ ticket.description }}</p>
-        <I>Date de création du Ticket: {{ ticket.created_at }}</I>
-        <br>
-        <img src="{{ ticket.image.url }}" alt="Ticket Image">
-        <br>
-        <I>Note: {{ ticket.note }} </I>
+    <h2>Modifier la critique {{ ticket.post.title }}</h2>
+    <br>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

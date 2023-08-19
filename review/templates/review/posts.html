@@ -1,34 +1,9 @@
 {% extends 'skeleton.html' %}
 
+{% block title %}Vos Tickets et Critiques{% endblock %}
+
 {% block content %}
-    <div class="content">
-        <button class="btn">Demander une critique</button>
-        <a href="{% url 'create_ticket' %}" class="btn">Créer un Ticket</a>
-        <div class="post-block">
-            {% for post in posts %}
-                {% if post.content_type == 'TICKET' %}
-                    <h1>Ticket</h1>
-                    <p>Titre du ticket: {{ post.title }}</p>
-                    <p>Desccription: {{post.description }}</p>
-                    <p>Createur du ticket: {{ post.creator }}</p>
-                    <img src="{{ post.image.url }}" alt="Ticket Image">
-                    <p>{{ post.created_at }}</p>
-                    {% if post.creator == request.user %}
-                        <a href="{% url 'delete_ticket' post.id %}">Supprimer le ticket</a>
-                        <a href="{% url 'update_ticket' post.id %}">Modifier le ticket</a>
-                    {% endif %}
-                {% elif post.content_type == 'CRITIQUE' %}
-                    <h1>Critique</h1>
-                    <p>Titre de la critique: {{ post.ticket.title }}</p>
-                    <p>Auteur de la critique: {{ post.user.username }}</p>
-                    <p>Description de la critique: {{ post.ticket.description }}</p>
-                    <p>Date de création: {{ post.ticket.created_at }}</p>
-                    <p>Score du ticket: {{ post.get_star_rating }}</p>
-                    {% if post.user == request.user %}
-                    <a href="{% url 'update_review' post.id %}">Modifier la critique</a>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
-{% endblock content %}
+
+    {% include 'review/_post_snippet.html' %}
+
+{% endblock %}

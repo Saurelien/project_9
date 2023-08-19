@@ -1,0 +1,22 @@
+{% extends 'skeleton.html' %}
+
+{% block title %}Créer un article{% endblock %}
+
+{% block content %}
+  <div>
+    <h1>Créer un nouvel article</h1>
+    <form method="post" action="{% url 'create_article' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Ticket</h2>
+            <p>{{ form.as_p }}</p>
+        <div class="rating-stars">
+            {% for i in "12345" %}
+                <input type="radio" name="{{ critique_form.rating.name }}" id="star{{ i }}" value="{{ i }}"
+                       {% if i == critique_form.rating.value %}checked{% endif %} />
+                <label for="star{{ i }}" class="star {% if i <= critique_form.rating.value %}active{% endif %}">&#9733;</label>
+            {% endfor %}
+        </div>
+          <button type="submit">Créer l'article</button>
+    </form>
+  </div>
+{% endblock %}

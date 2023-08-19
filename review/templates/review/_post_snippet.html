@@ -1,0 +1,104 @@
+<div class="post-block your-flux">
+    <h2 class="scrollable-title">Vos Tickets et Critiques</h2>
+    <form method="post" action="{% url 'create_ticket' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ ticket_form.as_p }}
+        <button type="submit">Créer le ticket</button>
+    </form>
+    <!-- Afficher les tickets créés par l'utilisateur -->
+    {% for ticket in user_tickets|dictsortreversed:"created_at" %}
+        <div class="ticket-block">
+            <h3>Titre du ticket: {{ ticket.title }}</h3>
+            <p>Description: {{ ticket.description|linebreaksbr }}</p>
+            <p>Créateur du ticket: {{ ticket.creator }}</p>
+            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+            {% if ticket.updated_at > ticket.created_at %}
+                <p>Date de mise à jour du ticket: {{ ticket.updated_at }}</p>
+            {% else %}
+                <p>Date de création du ticket: {{ ticket.created_at }}</p>
+            {% endif %}
+            {% if ticket.creator == user %}
+                <a href="{% url 'update_ticket' ticket.pk %}">Modifier le ticket</a>
+                <a href="{% url 'delete_ticket' ticket.pk %}">Supprimer le ticket</a>
+            {% endif %}
+
+            <!-- Afficher les critiques associées à ce ticket -->
+            {% for critique in ticket.ticket_critiques %}
+                <div class="critique-block">
+                    <h4>Critique</h4>
+                    <p>Titre de la critique: {{ critique.title }}</p>
+                    <p>Auteur de la critique: {{ critique.user.username }}</p>
+                    <p>Description de la critique: {{ critique.description|linebreaksbr }}</p>
+                    {% if critique.updated_at > critique.created_at %}
+                        <p>Date de mise à jour de la critique: {{ critique.updated_at }}</p>
+                    {% else %}
+                        <p>Date de création de la critique: {{ critique.created_at }}</p>
+                    {% endif %}
+                    <p>Score du ticket: {{ critique.get_star_rating }}</p>
+                    <!-- Autres détails de la critique -->
+                    {% if critique.user == user %}
+                        <a href="{% url 'update_review' critique.pk %}">Modifier la critique</a>
+                        <a href="{% url 'delete_review' critique.pk %}">Supprimer la critique</a>
+                    {% endif %}
+                    {% for reply in critique.get_threaded_reviews %}
+                        <div class="reply-block">
+                            <!-- Afficher les réponses hiérarchiques -->
+                            <p>Auteur de la réponse: {{ reply.user.username }}</p>
+                            <p>Contenu de la réponse: {{ reply.description|linebreaksbr }}</p>
+                            <!-- Autres détails de la réponse -->
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <!-- Afficher les tickets associés aux critiques des utilisateurs suivis -->
+    {% for ticket in followed_tickets %}
+        <div class="ticket-block">
+            <h3>Titre du ticket: {{ ticket.title }}</h3>
+            <p>Description: {{ ticket.description|linebreaksbr }}</p>
+            <p>Créateur du ticket: {{ ticket.creator }}</p>
+            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+            {% if ticket.updated_at > ticket.created_at %}
+                <p>Date de mise à jour du ticket: {{ ticket.updated_at }}</p>
+            {% else %}
+                <p>Date de création du ticket: {{ ticket.created_at }}</p>
+            {% endif %}
+
+            <!-- Afficher les critiques associées à ce ticket -->
+            {% for critique in ticket.ticket_critiques|dictsortreversed:"created_at" %}
+                <div class="critique-block">
+                    <h4>Critique</h4>
+                    <p>Titre de la critique: {{ critique.title }}</p>
+                    <p>Auteur de la critique: {{ critique.user.username }}</p>
+                    <p>Description de la critique: {{ critique.description|linebreaksbr }}</p>
+                    {% if critique.updated_at > critique.created_at|dictsortreversed:"updated_at" %}
+                        <p>Date de mise à jour de la critique: {{ critique.updated_at }}</p>
+                    {% else %}
+                        <p>Date de création de la critique: {{ critique.created_at }}</p>
+                    {% endif %}
+                    <p>Score du ticket: {{ critique.get_star_rating }}</p>
+                    <!-- Autres détails de la critique -->
+                    {% if critique.user == user %}
+                        <a href="{% url 'update_review' critique.pk %}">Modifier la critique</a>
+                        <a href="{% url 'delete_review' critique.pk %}">Supprimer la critique</a>
+                    {% endif %}
+                    {% for reply in critique.get_threaded_reviews %}
+                        <div class="reply-block">
+                            <!-- Afficher les réponses hiérarchiques -->
+                            <p>Auteur de la réponse: {{ reply.user.username }}</p>
+                            <p>Contenu de la réponse: {{ reply.description|linebreaksbr }}</p>
+                            <!-- Autres détails de la réponse -->
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+

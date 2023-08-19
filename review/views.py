@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm
+from review.forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm, ArticleCreationForm
 from django.views.generic.edit import FormView, UpdateView, CreateView
 from review.models import UserFollows, Review, Ticket
 from django.shortcuts import get_object_or_404, redirect
@@ -10,49 +10,76 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django import forms
 from django.views.generic import DeleteView
+from django.db.models import Q, CharField, Value
+from django.db.models.functions import Concat
+from PIL import Image
+import uuid
+from django.conf import settings
+from pathlib import Path
 from itertools import chain
-from django.db.models import CharField, Value
-from django.db.models import Q
 
 
 UserModel = get_user_model()
 
 
 def get_posts(users):
-    reviews = Review.objects.filter(user__in=users)
-    reviews = reviews.annotate(content_type=Value('CRITIQUE', CharField()))
+    reviews = Review.objects.filter(user__in=users).annotate(content_type=Value('CRITIQUE', CharField()))
 
-    # Utilisation de Q pour combiner des conditions de filtrage
-    tickets = Ticket.objects.filter(Q(creator__in=users) | Q(review__user__in=users))
-    tickets = tickets.annotate(content_type=Value('TICKET', CharField()))
+    tickets = Ticket.objects.filter(Q(creator__in=users) | Q(review__user__in=users)).annotate(
+        content_type=Value('TICKET', CharField()),
+        ticket_title=Concat('title', Value(' (Ticket)'), output_field=CharField())
+    )
 
-    # Obtenir toutes les critiques associées aux tickets des utilisateurs suivis
-    ticket_ids = tickets.values_list('id', flat=True)
-    associated_reviews = Review.objects.filter(ticket_id__in=ticket_ids)
-    associated_reviews = associated_reviews.annotate(content_type=Value('CRITIQUE', CharField()))
-
-    # Combiner et trier les trois types de posts
     return sorted(
-        chain(reviews, tickets, associated_reviews),
+        chain(reviews, tickets),
         key=lambda post: post.created_at,
         reverse=True
     )
 
 
 class FluxView(LoginRequiredMixin, TemplateView):
+    """
+    Vue pour afficher le flux de l'utilisateur avec des publications filtrées et organisées.
+    Cette vue récupère les publications (à la fois les tickets et les critiques)
+    des utilisateurs suivis par l'utilisateur connecté,
+    les organise pour éliminer les doublons de tickets, et les affiche dans un format convivial.
+    """
     template_name = 'review/flux.html'
 
     def get_context_data(self, **kwargs):
+        """
+        Récupère et organise les publications pour les afficher dans le flux de l'utilisateur.
+        Retourne un dictionnaire contenant les critiques organisées et filtrées.
+        """
         context = super().get_context_data(**kwargs)
 
         # Récupérer les utilisateurs suivis par l'utilisateur connecté
         utilisateurs_suivis = self.request.user.following.all()
 
-        # Créez une liste d'utilisateurs à partir des utilisateurs suivis
+        # Créer une liste d'utilisateurs à partir des utilisateurs suivis
         users = [user.followed_user for user in utilisateurs_suivis]
 
         # Utiliser la fonction get_posts pour obtenir les posts des utilisateurs suivis
-        context['posts'] = get_posts(users)
+        posts = get_posts(users)
+
+        # Créer un ensemble pour suivre les IDs des tickets déjà ajoutés
+        tickets_added = set()
+
+        # Filtrer les doublons et trier les critiques par date de création
+        filtered_posts = []
+        for post in posts:
+            if post.content_type == 'TICKET':
+                if post.pk not in tickets_added:
+                    tickets_added.add(post.pk)
+                    post.ticket_critiques = sorted(post.ticket_critiques(),
+                                                   key=lambda x: x.created_at,
+                                                   reverse=True
+                                                   )
+                    filtered_posts.append(post)  # Ajouter le ticket filtré
+            else:
+                filtered_posts.append(post)  # Ajouter les critiques normales
+
+        context['posts'] = filtered_posts
 
         return context
 
@@ -62,7 +89,17 @@ class PostsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['posts'] = get_posts([self.request.user])
+
+        # Récupérer les tickets créés par l'utilisateur
+        user_tickets = Ticket.objects.filter(creator=self.request.user)
+
+        # Récupérer les tickets associés aux critiques des utilisateurs suivis
+        followed_users = UserFollows.objects.filter(follower=self.request.user).values('followed_user')
+        followed_tickets = Ticket.objects.filter(creator__in=followed_users)
+
+        context['user_tickets'] = user_tickets
+        context['followed_tickets'] = followed_tickets
+
         return context
 
 
@@ -140,7 +177,21 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     template_name = 'review/create_ticket.html'
     form_class = TicketForm
-    success_url = reverse_lazy('posts')
+    success_url = reverse_lazy('flux')
+
+    def form_valid(self, form):
+        form.instance.creator = self.request.user
+
+        image = form.cleaned_data['image']
+        if image:
+            image_name = f'ticket_{uuid.uuid4().hex}.jpg'  # Générer un nom de fichier unique
+            img = Image.open(image)
+            img.thumbnail((300, 300))
+            img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
+
+            form.instance.image = f'ticket_images/{image_name}'  # Enregistrer le chemin de l'image
+
+        return super().form_valid(form)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -156,12 +207,14 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
             form.fields['note'].widget = forms.HiddenInput()
         return form
 
-    def form_valid(self, form):
-        form.instance.creator = self.request.user
-        return super().form_valid(form)
-
-
-""" Mettre à jour ou supprimer le ticket """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_id = self.kwargs.get('ticket_id')
+        if ticket_id:
+            ticket = get_object_or_404(Ticket, id=ticket_id)
+            context['ticket'] = ticket
+            context['reviews'] = Review.objects.filter(ticket=ticket)
+        return context
 
 
 class TicketUpdateView(LoginRequiredMixin, UpdateView):
@@ -173,15 +226,24 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
 
 class TicketDeleteView(DeleteView):
     model = Ticket
-    # Redirige vers la page flux après la suppression du ticket
     success_url = reverse_lazy('posts')
-    # Créez ce template pour demander confirmation à l'utilisateur avant de supprimer le ticket
     template_name = 'review/delete_ticket.html'
 
     def delete(self, request, *args, **kwargs):
         ticket = self.get_object()
-        print(f"Le ticket '{ticket.title}' a été supprimé le {ticket.created_at} par {request.user}")
-        messages.success(request, f"Le ticket '{ticket.title}' a été supprimé avec succès.")
+
+        # Supprimer l'image du ticket s'il existe
+        if ticket.image:
+            try:
+                # Supprimer le fichier d'image en utilisant PIL
+                ticket.image.delete()
+            except Exception as e:
+                # Gérer les erreurs éventuelles spécifiques à Pillow
+                messages.error(self.request, f"Erreur lors de la suppression de l'image : {e}")
+
+        # Supprimer toutes les critiques liées à ce ticket
+        ticket.critique_set.all().delete()
+        messages.success(self.request, "Le ticket a été supprimé avec succès.")
         return super().delete(request, *args, **kwargs)
 
 
@@ -192,26 +254,24 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     model = Review
     form_class = ReviewForm
     template_name = 'review/create_review.html'
-    success_url = reverse_lazy('flux')  # Mettez l'URL de redirection souhaitée après la création de la critique
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        ticket_id = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(Ticket, id=ticket_id)
-        context['ticket'] = ticket
-        return context
 
     def form_valid(self, form):
-        ticket_id = self.kwargs.get('ticket_id')
-        ticket = Ticket.objects.filter(id=ticket_id).first()
+        ticket_id = self.kwargs['ticket_id']
+        ticket = get_object_or_404(Ticket, pk=ticket_id)
 
-        if ticket:
-            form.instance.ticket = ticket
-            form.instance.user = self.request.user
-            return super().form_valid(form)
-        else:
-            messages.error(self.request, "Le ticket spécifié n'existe pas.")
-            return redirect('flux')
+        parent_review_id = self.request.POST.get('parent_review')
+        parent_review = None
+        if parent_review_id:
+            parent_review = get_object_or_404(Review, pk=parent_review_id)
+
+        form.instance.ticket = ticket
+        form.instance.user = self.request.user
+        form.instance.parent_review = parent_review
+
+        form.save()
+
+        # Redirect back to the ticket's detail page
+        return redirect('flux')
 
 
 class UpdateReviewView(LoginRequiredMixin, UpdateView):
@@ -221,8 +281,53 @@ class UpdateReviewView(LoginRequiredMixin, UpdateView):
     success_url = '/flux/'
 
 
-# TODO
-#  2: Nettoyer les vues & templates inutilisé
-#  3: Permettre a un utilisateur de se désabonner d'un utilisateur suivis
-#  4: Mettre en place la page post qui contiendra les critiques lié au ticket créer
+class DeleteReviewView(DeleteView):
+    model = Review
+    template_name = 'review/delete_review.html'
+    context_object_name = 'critique'
 
+    def get_success_url(self):
+        # Rediriger l'utilisateur vers le flux ou une autre page après la suppression de la critique
+        return reverse_lazy('flux')
+
+    def delete(self, request, *args, **kwargs):
+        critique = self.get_object()
+
+        # Supprimer la critique
+        critique.delete()
+
+        messages.success(self.request, "La critique a été supprimée avec succès.")
+        return super().delete(request, *args, **kwargs)
+
+
+class CreateArticleView(FormView):
+    template_name = 'review/article.html'
+    form_class = ArticleCreationForm
+    success_url = '/flux/'
+
+    def form_valid(self, form):
+        ticket = form.save(commit=False)
+        ticket.creator = self.request.user
+        ticket.save()
+
+        image = form.cleaned_data['image']  # Obtenez l'image du formulaire
+
+        if image:
+            image_name = f'ticket_{uuid.uuid4().hex}.jpg'
+            img = Image.open(image)
+            img.thumbnail((300, 300))
+            img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
+
+            ticket.image = f'ticket_images/{image_name}'
+            ticket.save()
+
+        # Créez une critique associée au ticket
+        Review.objects.create(
+            ticket=ticket,
+            rating=form.cleaned_data['rating'],
+            title=form.cleaned_data['review_title'],
+            description=form.cleaned_data['review_description'],
+            user=self.request.user
+        )
+
+        return super().form_valid(form)

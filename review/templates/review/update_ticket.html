@@ -1,7 +1,9 @@
 {% extends 'skeleton.html' %}
 
+    {% block title %}Mettre à jour un ticket{% endblock %}
+
 {% block content %}
-    <h2>Modifier le ticket {{ ticket.title }}</h2>
+    <h2>Modifier le ticket [{{ ticket.title }}]</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

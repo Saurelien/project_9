@@ -1,0 +1,94 @@
+.btn-create {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.post-block {
+  /*
+  Styles pour le bloc de texte posté par les utilisateurs
+  */
+}
+
+.connected::after {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: green;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+
+/* Styling pour le bloc principal de contenu */
+.post-block {
+    max-width: 100%; /* Largeur maximale */
+    width: 1000px; /* Largeur initiale */
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(to bottom, #f4f4f4, rgba(244, 244, 244, 0)); /* Dégradé du haut vers le bas */
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling pour le titre "Votre flux" */
+.scrollable-title {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 0; /* Ajustez le padding vertical pour agrandir la hauteur */
+    text-align: center;
+}
+
+/* Styling pour le contenu scrollable */
+.scrollable-content {
+    max-height: 100%; /* Hauteur maximale */
+    height: 550px; /* Hauteur initiale */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale si nécessaire */
+}
+
+/* Masque la barre de défilement (Chrome, Safari) */
+.scrollable-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* Styling pour les blocs de ticket */
+.ticket-block {
+    background-color: #eaf4ff;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Bordure grise */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre prononcée */
+    max-width: 100%; /* Limiter la largeur maximale */
+}
+
+/* Styling pour les blocs de critique */
+.critique-block {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-left: 4px solid #ffc107;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc; /* Bordure grise */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre prononcée */
+    position: relative;
+}
+
+/* Styling pour la flèche */
+.critique-block::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -15px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right-color: #000; /* Couleur de la flèche noire */
+}
+
+/* Styling pour les détails du ticket associé */
+.ticket-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
