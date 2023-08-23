@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ticket, Review, Article
+from .models import Ticket, Review
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
@@ -23,26 +23,20 @@ class TicketUpdateForm(forms.ModelForm):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['title', 'description', 'rating', 'parent_review']
-        widgets = {
-            'rating': forms.HiddenInput(),
-            'parent_review': forms.HiddenInput(),
-        }
+        fields = ['title', 'description', 'rating']
 
 
-class ArticleCreationForm(forms.ModelForm):
+class TicketAndReviewForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ['title', 'description', 'image']
 
-    review_title = forms.CharField(
-        label='Titre de la critique',
-        max_length=200,
-        required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Titre de la critique'}),
+    rating = forms.IntegerField(
+        label="Note",
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
-    review_description = forms.CharField(
-        label='Description de la critique',
-        widget=forms.Textarea(attrs={'placeholder': 'Description de la critique'}),
-        required=True,
+    critique_title = forms.CharField(label="Titre de la critique")
+    critique_description = forms.CharField(
+        label="Description de la critique",
+        widget=forms.Textarea
     )

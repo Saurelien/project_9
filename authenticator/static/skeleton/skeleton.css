@@ -2,12 +2,24 @@ body {
   position: relative;
   background: linear-gradient(135deg, #FFA500, #FF8C00, #FF6347, #FF4500);
   background-size: 400% 400%;
-  animation: gradientAnimation 10s infinite;
+  animation: gradientAnimation 10s infinite, waveAnimation 2s infinite; /* Ajout de l'animation d'ondulation */
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  overflow: hidden;
   z-index: 1;
+}
+
+/* Animation d'ondulation pour le dégradé */
+@keyframes waveAnimation {
+    0% {
+        background-position: 0 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
 }
 
 body::before,

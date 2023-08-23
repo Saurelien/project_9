@@ -6,7 +6,7 @@
     <form method="POST" action="{% url 'subscribe_user' %}">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Rechercher un utilisateur">
-        <button type="submit">S'abonner pour suivre l'utilisateur</button>
+        <button type="submit">Cliquer pour suivre l'utilisateur</button>
     </form>
     <h1>Utilisateurs suivis</h1>
     <ul>

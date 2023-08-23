@@ -1,43 +1,24 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from review.forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm, ArticleCreationForm
-from django.views.generic.edit import FormView, UpdateView, CreateView
+from review.forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm, TicketAndReviewForm
+from django.views.generic import FormView, UpdateView, CreateView, ListView, TemplateView
 from review.models import UserFollows, Review, Ticket
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
 from django.views.generic.base import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django import forms
 from django.views.generic import DeleteView
-from django.db.models import Q, CharField, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 from PIL import Image
 import uuid
 from django.conf import settings
 from pathlib import Path
-from itertools import chain
-
 
 UserModel = get_user_model()
 
 
-def get_posts(users):
-    reviews = Review.objects.filter(user__in=users).annotate(content_type=Value('CRITIQUE', CharField()))
-
-    tickets = Ticket.objects.filter(Q(creator__in=users) | Q(review__user__in=users)).annotate(
-        content_type=Value('TICKET', CharField()),
-        ticket_title=Concat('title', Value(' (Ticket)'), output_field=CharField())
-    )
-
-    return sorted(
-        chain(reviews, tickets),
-        key=lambda post: post.created_at,
-        reverse=True
-    )
-
-
-class FluxView(LoginRequiredMixin, TemplateView):
+class FluxView(LoginRequiredMixin, ListView):
     """
     Vue pour afficher le flux de l'utilisateur avec des publications filtrées et organisées.
     Cette vue récupère les publications (à la fois les tickets et les critiques)
@@ -45,43 +26,16 @@ class FluxView(LoginRequiredMixin, TemplateView):
     les organise pour éliminer les doublons de tickets, et les affiche dans un format convivial.
     """
     template_name = 'review/flux.html'
+    context_object_name = 'tickets'
 
-    def get_context_data(self, **kwargs):
-        """
-        Récupère et organise les publications pour les afficher dans le flux de l'utilisateur.
-        Retourne un dictionnaire contenant les critiques organisées et filtrées.
-        """
-        context = super().get_context_data(**kwargs)
+    def get_queryset(self):
 
         # Récupérer les utilisateurs suivis par l'utilisateur connecté
         utilisateurs_suivis = self.request.user.following.all()
-
         # Créer une liste d'utilisateurs à partir des utilisateurs suivis
         users = [user.followed_user for user in utilisateurs_suivis]
-
-        # Utiliser la fonction get_posts pour obtenir les posts des utilisateurs suivis
-        posts = get_posts(users)
-
-        # Créer un ensemble pour suivre les IDs des tickets déjà ajoutés
-        tickets_added = set()
-
-        # Filtrer les doublons et trier les critiques par date de création
-        filtered_posts = []
-        for post in posts:
-            if post.content_type == 'TICKET':
-                if post.pk not in tickets_added:
-                    tickets_added.add(post.pk)
-                    post.ticket_critiques = sorted(post.ticket_critiques(),
-                                                   key=lambda x: x.created_at,
-                                                   reverse=True
-                                                   )
-                    filtered_posts.append(post)  # Ajouter le ticket filtré
-            else:
-                filtered_posts.append(post)  # Ajouter les critiques normales
-
-        context['posts'] = filtered_posts
-
-        return context
+        return Ticket.objects.filter(Q(creator__in=users) |
+                                     Q(reviews__user__in=users)).distinct().order_by('-created_at')
 
 
 class PostsView(LoginRequiredMixin, TemplateView):
@@ -89,24 +43,41 @@ class PostsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
 
         # Récupérer les tickets créés par l'utilisateur
-        user_tickets = Ticket.objects.filter(creator=self.request.user)
+        user_tickets = Ticket.objects.filter(creator=user).order_by('-created_at')
+        # Récupérer les tickets des utilisateurs suivis
+        followed_users = UserFollows.objects.filter(follower=user).values_list('followed_user', flat=True)
+        followed_tickets = Ticket.objects.filter(creator__in=followed_users).order_by('-created_at')
+        ticket_ids_with_reviews = Review.objects.filter(user=self.request.user).values_list('ticket_id',
+                                                                                            flat=True).distinct()
+        # Récupérer les critiques associées aux tickets de l'utilisateur authentifié
+        user_critiques = Review.objects.filter(user=user, ticket__in=user_tickets).order_by('-created_at')
 
-        # Récupérer les tickets associés aux critiques des utilisateurs suivis
-        followed_users = UserFollows.objects.filter(follower=self.request.user).values('followed_user')
-        followed_tickets = Ticket.objects.filter(creator__in=followed_users)
+        # Récupérer les critiques associées aux tickets créés par les utilisateurs suivis
+        user_reviews_in_followed_tickets = Review.objects.filter(
+            Q(ticket__creator=user) |
+            Q(ticket__creator__in=followed_users) |
+            Q(ticket__in=followed_tickets),
+            user__in=followed_users
+        ).order_by('-created_at')
 
+        context['user_reviews_in_followed_tickets'] = user_reviews_in_followed_tickets
+        context['followed_users'] = followed_users
         context['user_tickets'] = user_tickets
-        context['followed_tickets'] = followed_tickets
+        context['followed_tickets_with_user_critiques'] = followed_tickets
+        context['user_critiques'] = user_critiques
+        context['ticket_ids_with_reviews'] = ticket_ids_with_reviews
 
         return context
 
 
 class SubscribeUserView(View):
     """
-Définir une méthode comme statique (@staticmethod) dans une vue basée sur classe en Django n'est pas obligatoire et,
- en fait, c'est généralement déconseillé pour les méthodes de traitement de requêtes HTTP comme post ou get.
+    Définir une méthode comme statique (@staticmethod)
+    dans une vue basée sur classe en Django n'est pas obligatoire et,
+    en fait, c'est généralement déconseillé pour les méthodes de traitement de requêtes HTTP comme post ou get.
     """
     def post(self, request):
         username = request.POST.get('username')
@@ -116,8 +87,9 @@ Définir une méthode comme statique (@staticmethod) dans une vue basée sur cla
 
             # S'assurer que l'utilisateur existe avant de le suivre
             if user_to_follow:
-                # Vérifier si la relation de suivi existe déjà
-                if not UserFollows.objects.filter(follower=request.user, followed_user=user_to_follow).exists():
+                if user_to_follow.username == request.user.username:
+                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même.")
+                elif not UserFollows.objects.filter(follower=request.user, followed_user=user_to_follow).exists():
                     # Créer la relation de suivi
                     UserFollows.objects.create(follower=request.user, followed_user=user_to_follow)
                     messages.success(request, f"Vous suivez maintenant {user_to_follow.username}.")
@@ -300,34 +272,34 @@ class DeleteReviewView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class CreateArticleView(FormView):
+class CreateTicketAndReviewView(LoginRequiredMixin, CreateView):
     template_name = 'review/article.html'
-    form_class = ArticleCreationForm
-    success_url = '/flux/'
+    form_class = TicketAndReviewForm
+    success_url = reverse_lazy('posts')
 
     def form_valid(self, form):
-        ticket = form.save(commit=False)
-        ticket.creator = self.request.user
-        ticket.save()
 
-        image = form.cleaned_data['image']  # Obtenez l'image du formulaire
-
+        image = form.cleaned_data['image']
         if image:
             image_name = f'ticket_{uuid.uuid4().hex}.jpg'
             img = Image.open(image)
             img.thumbnail((300, 300))
             img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
 
-            ticket.image = f'ticket_images/{image_name}'
-            ticket.save()
+            form.instance.image = f'ticket_images/{image_name}'
+        # Créez le ticket
+        ticket = form.save(commit=False)
+        ticket.creator = self.request.user
+        ticket.save()
 
-        # Créez une critique associée au ticket
-        Review.objects.create(
+        # Créez la critique associée
+        critique = Review(
             ticket=ticket,
             rating=form.cleaned_data['rating'],
-            title=form.cleaned_data['review_title'],
-            description=form.cleaned_data['review_description'],
+            title=form.cleaned_data['critique_title'],
+            description=form.cleaned_data['critique_description'],
             user=self.request.user
         )
+        critique.save()
 
         return super().form_valid(form)

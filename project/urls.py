@@ -19,7 +19,7 @@ from django.urls import path
 from authenticator.views import RegisterView, LogoutUserView, ListAllUser, LoginView
 from review.views import FluxView, FollowUserView, TicketCreateView, PostsView,\
     UnfollowUserView, SubscribeUserView, TicketUpdateView, TicketDeleteView, CreateReviewView, UpdateReviewView,\
-    DeleteReviewView, CreateArticleView
+    DeleteReviewView, CreateTicketAndReviewView
 # from messagesbox.views import PrivateMessageView, SendPrivateMessageView, TicketReplyNotificationsView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -46,7 +46,7 @@ urlpatterns = [
     path('review/<int:pk>/delete/', DeleteReviewView.as_view(), name='delete_review'),
     path('create_review/<int:ticket_id>/', CreateReviewView.as_view(), name='create_review'),
     path('review/<int:pk>/update', UpdateReviewView.as_view(), name='update_review'),
-    path('create_article/', CreateArticleView.as_view(), name='create_article'),
+    path('create_article/', CreateTicketAndReviewView.as_view(), name='create_article'),
     # path('validate_ticket/<int:ticket_id>/', ValidateTicketView.as_view(), name='validate_ticket'),
     path('admin/', admin.site.urls),
 ]

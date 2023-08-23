@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-wkc7t8s=rltk5r0n6@98ig22u_ir_bam*9#@=89+jr0+=sl_xc
 DEBUG = True
 
 ALLOWED_HOSTS = []
+DEFAULT_ARTICLE_CREATOR = 'anonymous'
 
 
 # Application definition
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'review',
     'project',
     'messagesbox',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

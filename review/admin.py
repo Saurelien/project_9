@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from review.models import Ticket, ActionHistory, Review
+from review.models import Ticket, Review
 
 
 class TicketAdmin(admin.ModelAdmin):
@@ -13,9 +13,7 @@ class TicketAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(reverse("flux"))
         return super().response_change(request, obj)
 
-# Enregistrer le modèle Ticket avec la classe TicketAdmin personnalisée
-
 
 admin.site.register(Ticket, TicketAdmin)
-admin.site.register(ActionHistory)
 admin.site.register(Review)
+
