@@ -1,0 +1,18 @@
+{% extends 'skeleton.html' %}
+
+{% block title %} Créer une critique {% endblock %}
+
+{% block content %}
+  <div>
+    <h1>Créer une critique contenant un ticket</h1>
+    <form method="post" action="{% url 'review' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+
+        <h2>Critique</h2>
+        <p>{{ form.as_p }}</p>
+
+        <button type="submit">Créer l'article</button>
+    </form>
+  </div>
+{% endblock %}

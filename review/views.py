@@ -14,6 +14,7 @@ from PIL import Image
 import uuid
 from django.conf import settings
 from pathlib import Path
+from itertools import chain
 
 UserModel = get_user_model()
 
@@ -45,31 +46,23 @@ class PostsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # Récupérer les tickets créés par l'utilisateur
+        # Récupérer les tickets créés par l'utilisateur (antichronologique)
         user_tickets = Ticket.objects.filter(creator=user).order_by('-created_at')
-        # Récupérer les tickets des utilisateurs suivis
-        followed_users = UserFollows.objects.filter(follower=user).values_list('followed_user', flat=True)
-        followed_tickets = Ticket.objects.filter(creator__in=followed_users).order_by('-created_at')
-        ticket_ids_with_reviews = Review.objects.filter(user=self.request.user).values_list('ticket_id',
-                                                                                            flat=True).distinct()
-        # Récupérer les critiques associées aux tickets de l'utilisateur authentifié
-        user_critiques = Review.objects.filter(user=user, ticket__in=user_tickets).order_by('-created_at')
 
-        # Récupérer les critiques associées aux tickets créés par les utilisateurs suivis
-        user_reviews_in_followed_tickets = Review.objects.filter(
-            Q(ticket__creator=user) |
-            Q(ticket__creator__in=followed_users) |
-            Q(ticket__in=followed_tickets),
-            user__in=followed_users
-        ).order_by('-created_at')
+        # Récupérer les tickets des utilisateurs suivis (sans tri)
+        users_followed = UserFollows.objects.filter(follower=user).values_list('followed_user', flat=True)
+        # récupération des tickets associées à la critique de l'utilisateur connecté
+        followed_tickets_with_user_critiques = Ticket.objects.filter(
+            creator__in=users_followed,
+            reviews__user=user
+        ).distinct().order_by('-created_at')
+        all_tickets = sorted(
+            chain(user_tickets, followed_tickets_with_user_critiques),
+            key=lambda ticket: ticket.created_at,
+            reverse=True
+        )
 
-        context['user_reviews_in_followed_tickets'] = user_reviews_in_followed_tickets
-        context['followed_users'] = followed_users
-        context['user_tickets'] = user_tickets
-        context['followed_tickets_with_user_critiques'] = followed_tickets
-        context['user_critiques'] = user_critiques
-        context['ticket_ids_with_reviews'] = ticket_ids_with_reviews
-
+        context['all_tickets'] = all_tickets
         return context
 
 
@@ -227,6 +220,13 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     form_class = ReviewForm
     template_name = 'review/create_review.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_id = self.kwargs['ticket_id']
+        ticket = get_object_or_404(Ticket, pk=ticket_id)
+        context['ticket'] = ticket
+        return context
+
     def form_valid(self, form):
         ticket_id = self.kwargs['ticket_id']
         ticket = get_object_or_404(Ticket, pk=ticket_id)
@@ -273,7 +273,7 @@ class DeleteReviewView(DeleteView):
 
 
 class CreateTicketAndReviewView(LoginRequiredMixin, CreateView):
-    template_name = 'review/article.html'
+    template_name = 'review/review.html'
     form_class = TicketAndReviewForm
     success_url = reverse_lazy('posts')
 

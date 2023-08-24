@@ -25,13 +25,14 @@ class Review(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)],
         default=0
     )
-    title = models.CharField(max_length=200, default="")
-    description = models.TextField(default="")
+    # Headline
+    title = models.CharField(max_length=128, default="")
+    # Body
+    description = models.TextField(max_length=8192, blank=True, default="")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    display_order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"Critique de {self.ticket.title} par {self.user.username}, Note: {self.rating}"
@@ -45,9 +46,9 @@ class Review(models.Model):
 
 
 class UserFollows(models.Model):
-    # Utilisateurs suivis
+    # Utilisateurs suivis " User "
     follower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='following')
-    # Utilisateur abonnés
+    # Utilisateur abonnés " followed_user
     followed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='followers')
 
     class Meta:

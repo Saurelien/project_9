@@ -16,11 +16,12 @@
             <li><a href="{% url 'flux' %}">Flux</a></li>
             <li><a href="{% url 'posts' %}">Posts</a></li>
             <li><a href="{% url 'flux_utilisateurs' %}">Abonnements</a></li>
+            <button><a href="{% url 'user_list' %}">Liste des utilisateurs</a></button>
             {% if user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
             {% endif %}
             {% if request.user.is_superuser %}
-                <a href="{% url 'admin:index' %}" class="btn">Espace admin</a>
+                <li><a href="{% url 'admin:index' %}" class="btn">Espace admin</a></li>
             {% endif %}
             {% if user.is_authenticated %}
                 <li>
