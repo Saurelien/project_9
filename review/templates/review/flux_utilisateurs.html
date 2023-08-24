@@ -3,28 +3,31 @@
 {% block title %}Abonnements{% endblock %}
 
 {% block content %}
-    <form method="POST" action="{% url 'subscribe_user' %}">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="Rechercher un utilisateur">
-        <button type="submit">Cliquer pour suivre l'utilisateur</button>
-    </form>
-    <h1>Utilisateurs suivis</h1>
-    <ul>
-        {% for s_user in utilisateurs_suivis %}
-            <li>
-                {{ s_user.followed_user.username }}
-                <form method="post" action="{% url 'unfollow_user' s_user.followed_user.username %}">
-                    {% csrf_token %}
-                    <button type="submit">Se désabonner</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="post-block your-flux">
+        <h2 class="scrollable-title">Système d'abonnement</h2>
+        <form method="POST" action="{% url 'subscribe_user' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Rechercher un utilisateur">
+            <button type="submit">Cliquer pour suivre l'utilisateur</button>
+        </form>
+        <h1>Utilisateurs suivis</h1>
+        <ul>
+            {% for s_user in utilisateurs_suivis %}
+                <li>
+                    {{ s_user.followed_user.username }}
+                    <form method="post" action="{% url 'unfollow_user' s_user.followed_user.username %}">
+                        {% csrf_token %}
+                        <button type="submit">Se désabonner</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
 
-    <h1>Utilisateurs abonnés</h1>
-    <ul>
-        {% for f_user in abonnes %}
-            <li>{{ f_user.follower.username }}</li>
-        {% endfor %}
-    </ul>
+        <h1>Utilisateurs abonnés</h1>
+        <ul>
+            {% for f_user in abonnes %}
+                <li>{{ f_user.follower.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
