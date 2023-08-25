@@ -25,19 +25,6 @@
                         </form>
                     </div>
                 {% endif %}
-                <p><strong>Id du ticket [{{ ticket.id }}]</strong></p>
-                <p>Vous avez publié un ticket [{{ ticket.creator }}]</p>
-                <h3>Titre du ticket: {{ ticket.title }}</h3>
-                <p>Description: {{ ticket.description|linebreaksbr }}</p>
-                <img src="{{ ticket.image.url }}" alt="Ticket Image">
-                <p>Date de création du ticket: {{ ticket.created_at }}</p>
-                {% if ticket.creator == user %}
-                    <form>
-                        <button><a href="{% url 'create_review' ticket.id %}">Répondre au ticket</a></button>
-                        <button><a href="{% url 'update_ticket' ticket.pk %}">Modifier le ticket</a></button>
-                        <button><a href="{% url 'delete_ticket' ticket.pk %}">Supprimer le ticket</a></button>
-                    </form>
-                {% endif %}
             </div>
         {% endfor %}
         <div class="ticket-block">
@@ -45,7 +32,9 @@
             <p>Ticket - [{{ ticket.creator }}]</p>
             <h3>Titre du ticket: {{ ticket.title }}</h3>
             <p>Description: {{ ticket.description|linebreaksbr }}</p>
-            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+            {% if ticket.image %}
+            <img src="{{ ticket.image.url }}" alt="Image du ticket">
+            {% endif %}
             <p>Date de création du ticket: {{ ticket.created_at }}</p>
             {% if ticket.creator == user %}
                 <form>
@@ -67,6 +56,13 @@
                         <button><a href="{% url 'update_review' critique.pk %}">Modifier la critique</a></button>
                         <button><a href="{% url 'delete_review' critique.pk %}">Supprimer la critique</a></button>
                         {% endif %}
+                        <h2>Détails du ticket</h2>
+                        <p><strong>Id du ticket [{{ ticket.id }}]</strong></p>
+                        <p>Ticket - [{{ ticket.creator }}]</p>
+                        <h3>Titre du ticket: {{ ticket.title }}</h3>
+                        <p>Description: {{ ticket.description|linebreaksbr }}</p>
+                        <img src="{% if ticket.image %}{{ ticket.image.url }}{% else %}url_vers_une_image_par_defaut.png{% endif %}" alt="Image du ticket">
+                        <p>Date de création du ticket: {{ ticket.created_at }}</p>
                     </div>
                 {% endif %}
             {% endfor %}

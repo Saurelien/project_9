@@ -4,26 +4,26 @@
 
 {% block content %}
 
-    <!-- Afficher les critiques associées au ticket -->
-    {% if reviews %}
-        <h2>Critiques associées</h2>
-        <ul>
-            {% for review in reviews %}
-                <li>
-                    <p>Titre de la critique: {{ review.title }}</p>
-                    <p>Auteur de la critique: {{ review.user.username }}</p>
-                    <p>Description de la critique: {{ review.description | linebreaksbr }}</p>
-                    <p>Date de création de la critique: {{ review.created_at }}</p>
-                    <p>Score du ticket: {{ review.get_star_rating }}</p>
-                    <!-- Ajoutez les liens pour modifier et supprimer la critique ici -->
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <h2>Créer un nouveau ticket</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Créer le ticket</button>
-    </form>
+    <div class="post-block your-flux">
+        {% if reviews %}
+            <h2>Critiques associées</h2>
+            <ul>
+                {% for review in reviews %}
+                    <li>
+                        <p>Titre de la critique: {{ review.title }}</p>
+                        <p>Auteur de la critique: {{ review.user.username }}</p>
+                        <p>Description de la critique: {{ review.description | linebreaksbr }}</p>
+                        <p>Date de création de la critique: {{ review.created_at }}</p>
+                        <p>Score du ticket: {{ review.get_star_rating }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <h2>Créer un nouveau ticket</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Créer le ticket</button>
+        </form>
+    </div>
 {% endblock %}

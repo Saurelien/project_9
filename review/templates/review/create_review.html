@@ -3,14 +3,16 @@
 {% block title %}Créer une critique{% endblock %}
 
 {% block content %}
-    <h2>Créer une critique pour le ticket associé a l'id [{{ ticket.id }}]</h2>
-    <h3>Titre du ticket : {{ ticket.title }}</h3>
-    <p>Description : {{ ticket.description|linebreaksbr }}</p>
-    <p>Créateur du ticket : {{ ticket.creator }}</p>
-    <img src="{{ ticket.image.url }}" alt="Image du ticket">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Créer la critique">
-    </form>
+    <div class="post-block your-flux">
+        <h2>Créer une critique pour le ticket associé a l'id [{{ ticket.id }}]</h2>
+        <h3>Titre du ticket : {{ ticket.title }}</h3>
+        <p>Description : {{ ticket.description|linebreaksbr }}</p>
+        <p>Créateur du ticket : {{ ticket.creator }}</p>
+        <img src="{{ ticket.image.url }}" alt="Image du ticket" width="300" height="400">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Créer la critique">
+        </form>
+    </div>
 {% endblock content %}

@@ -6,7 +6,7 @@
             <h3>Titre du ticket: {{ ticket.title }}</h3>
             <p>Description: {{ ticket.description|linebreaksbr }}</p>
             <p>Createur du ticket: {{ ticket.creator }}</p>
-            <img src="{{ ticket.image.url }}" alt="Ticket Image">
+            <img src="{% if ticket.image %}{{ ticket.image.url }}{% else %}url_vers_une_image_par_defaut.png{% endif %}" alt="Image du ticket">
             {% if ticket.updated_at > ticket.created_at %}
                 <p>Date de mise à jour du ticket: {{ ticket.updated_at }}</p>
             {% else %}
@@ -30,14 +30,8 @@
                     <p>Date de création de la critique: {{ critique.created_at }}</p>
                     <p>Score du ticket: {{ critique.get_star_rating }}</p>
                     {% if critique.user == user %}
-                        <form method="post" action="{% url 'update_review' critique.pk %}">
-                            {% csrf_token %}
-                            <button type="submit">Modifier la critique</button>
-                        </form>
-                        <form method="post" action="{% url 'delete_review' critique.pk %}">
-                            {% csrf_token %}
-                            <button type="submit">Supprimer la critique</button>
-                        </form>
+                        <button><a href="{% url 'update_review' critique.pk %}">Modifier la critique</a></button>
+                        <button><a href="{% url 'delete_review' critique.pk %}">Supprimer le ticket</a></button>
                     {% endif %}
                 </div>
             {% endfor %}

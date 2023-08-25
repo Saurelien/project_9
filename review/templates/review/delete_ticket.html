@@ -3,17 +3,13 @@
     {% block title %}Supprimer un ticket{% endblock %}
 
 {% block content %}
-    <html>
-    <head>
+    <div class="post-block your-flux">
         <title>Confirmation de suppression du ticket</title>
-    </head>
-    <body>
         <h1>Confirmer la suppression du ticket "{{ object.title }}"</h1>
         <form method="post">
             {% csrf_token %}
             <input type="submit" value="Supprimer">
         </form>
         <a href="{% url 'flux' %}">Annuler</a>
-    </body>
-    </html>
+    </div>
 {% endblock %}

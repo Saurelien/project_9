@@ -3,10 +3,12 @@
     {% block title %}Mettre à jour un ticket{% endblock %}
 
 {% block content %}
-    <h2>Modifier le ticket [{{ ticket.title }}]</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Mettre à jour le ticket</button>
-    </form>
+    <div class="post-block your-flux">
+        <h2>Modifier le ticket [{{ ticket.title }}]</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Mettre à jour le ticket</button>
+        </form>
+    </div>
 {% endblock %}

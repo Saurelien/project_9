@@ -33,7 +33,6 @@ urlpatterns = [
     path('logout/', LogoutUserView.as_view(), name='logout'),
     path('subscribe/', SubscribeUserView.as_view(), name='subscribe_user'),
     path('abonnements/', FollowUserView.as_view(), name='flux_utilisateurs'),
-    path('users/', ListAllUser.as_view(), name='user_list'),
     path('create_ticket/', TicketCreateView.as_view(), name='create_ticket'),
     path('posts/', PostsView.as_view(), name='posts'),
     path('unfollow/<str:username>/', UnfollowUserView.as_view(), name='unfollow_user'),
