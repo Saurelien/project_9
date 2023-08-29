@@ -6,7 +6,6 @@ de consulterou de solliciter une critique de livres à la demande
 ## Installation
 
 1. # Clonez le dépôt:
-
    `git clone https://github.com/Saurelien/project_9.git`
 3. # Accédez au répertoire du projet :
    Utilisez la commande cd pour accéder au répertoire du projet que vous venez de cloner :
@@ -34,6 +33,13 @@ de consulterou de solliciter une critique de livres à la demande
 - ### D'avoir accès au panel administrateur " Si l'utilisateur est un super user "
 - ### Se deconnecter
 
-5. # Exécutez le projet 
-6. ## en utilisant la commande `python manage.py runserver`.
-7. ## Cela devrait démarrer le serveur de developpement local: http://127.0.0.1:8000/
+5. # Les utilisateurs test:
+
+- ### cstem, "super user" mot de passe: " r1a2i3n4 "
+- ### toto, mot de passe: " r1a2i3n4 "
+- ### gilbert, mot de passe: " r1a2i3n4 "
+- ### zoe1987, mot de passe: " r1a2i3n4 " 
+
+6. # Exécutez le projet 
+7. ## en utilisant la commande `python manage.py runserver`.
+8. ## Cela devrait démarrer le serveur de developpement local: http://127.0.0.1:8000/

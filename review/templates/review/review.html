@@ -8,9 +8,29 @@
         <form method="post" action="{% url 'review' %}" enctype="multipart/form-data">
             {% csrf_token %}
 
+            <h2>Ticket</h2>
+            <p>{{ form.title.label_tag }}</p>
+            <p>{{ form.title }}</p>
+            <p>{{ form.description.label_tag }}</p>
+            <p>{{ form.description }}</p>
+            <p>{{ form.image.label_tag }}</p>
+            <p>{{ form.image }}</p>
 
             <h2>Critique</h2>
-            <p>{{ form.as_p }}</p>
+            <p>{{ form.critique_title.label_tag }}</p>
+            <p>{{ form.critique_title }}</p>
+            <p>{{ form.critique_description.label_tag }}</p>
+            <p>{{ form.critique_description }}</p>
+
+            <h3>Rating</h3>
+            <div class="form-check form-check-inline">
+                {% for choice_value, choice_label in form.rating.field.choices %}
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="radio" name="{{ form.rating.name }}" value="{{ choice_value }}" {% if choice_value == form.rating.value %}checked{% endif %}>
+                        {{ choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
 
             <button type="submit">Créer l'article</button>
         </form>

@@ -67,11 +67,7 @@ class PostsView(LoginRequiredMixin, TemplateView):
 
 
 class SubscribeUserView(View):
-    """
-    Définir une méthode comme statique (@staticmethod)
-    dans une vue basée sur classe en Django n'est pas obligatoire et,
-    en fait, c'est généralement déconseillé pour les méthodes de traitement de requêtes HTTP comme post ou get.
-    """
+
     def post(self, request):
         username = request.POST.get('username')
         if username:
@@ -132,10 +128,6 @@ class UnfollowUserView(LoginRequiredMixin, View):
 
         # Rediriger l'utilisateur vers une page appropriée (par exemple, la liste des utilisateurs suivis)
         return redirect('flux_utilisateurs')
-
-
-""" Vue de la gestion des tickets """
-""" Consommation du model Ticket """
 
 
 class TicketCreateView(LoginRequiredMixin, CreateView):

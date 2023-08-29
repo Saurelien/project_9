@@ -8,8 +8,17 @@
         <br>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Mettre à jour le ticket</button>
+            <p>Titre de la critique: {{ form.title }}</p>
+            <p>Commentaire: {{ form.description }}</p>
+            <div class="form-check form-check-inline">
+                {% for choice_value, choice_label in form.rating.field.choices %}
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="radio" name="{{ form.rating.name }}" value="{{ choice_value }}" {% if choice_value == form.rating.value %}checked{% endif %}>
+                        {{ choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
+            <button type="submit">Mettre à jour la critique</button>
         </form>
     </div>
 {% endblock %}

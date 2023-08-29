@@ -7,26 +7,7 @@
         <a href="{% url 'review' %}">Créer une critique</a>
     </button>
     {% for ticket in all_tickets %}
-        {% for ticket in user_tickets %}
-            <div class="ticket-block">
-                <!-- Afficher les critiques du ticket complet et du ticket de l'utilisateur connecté -->
-                {% if ticket.user == user %}
-                    <div class="critique-block">
-                        <h4>Critique</h4>
-                        <p>{{ critique.user.username }} a crée une critique pour le ticket: [{{ ticket.id }}] </p>
-                        <p>Titre de la critique: {{ critique.title }}</p>
-                        <p>Auteur de la critique: {{ critique.user.username }}</p>
-                        <p>Description de la critique: {{ critique.description|linebreaksbr }}</p>
-                        <p>Date de création de la critique: {{ critique.created_at }}</p>
-                        <p>Score du ticket: {{ critique.get_star_rating }}</p>
-                        <form>
-                            <button><a href="{% url 'update_review' critique.pk %}">Modifier la critique</a></button>
-                            <button><a href="{% url 'delete_review' critique.pk %}">Supprimer la critique</a></button>
-                        </form>
-                    </div>
-                {% endif %}
-            </div>
-        {% endfor %}
+
         <div class="ticket-block">
             <p><strong>Id du ticket [{{ ticket.id }}]</strong></p>
             <p>Ticket - [{{ ticket.creator }}]</p>
@@ -40,6 +21,7 @@
                 <form>
                     <button><a href="{% url 'update_ticket' ticket.pk %}">Modifier le ticket</a></button>
                     <button><a href="{% url 'delete_ticket' ticket.pk %}">Supprimer le ticket</a></button>
+                    <button><a href="{% url 'create_review' ticket.id %}">Répondre au ticket</a></button>
                 </form>
             {% endif %}
             <!-- Afficher les critiques de l'utilisateur connecté associées au ticket de l'utilisateur suivit -->
@@ -49,7 +31,7 @@
                         <p>{{ critique.user.username }} a crée une critique pour le ticket: [{{ ticket.id }}] </p>
                         <p>Titre de la critique: {{ critique.title }}</p>
                         <p>Auteur de la critique: {{ critique.user.username }}</p>
-                        <p>Description de la critique: {{ critique.description|linebreaksbr }}</p>
+                        <p>Commentaire: {{ critique.description|linebreaksbr }}</p>
                         <p>Date de création de la critique: {{ critique.created_at }}</p>
                         <p>Score du ticket: {{ critique.get_star_rating }}</p>
                         {% if critique.user == user %}

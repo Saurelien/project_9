@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'authenticator',
     'review',
     'project',
-    'messagesbox',
     'django_extensions',
 ]
 

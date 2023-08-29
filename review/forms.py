@@ -1,6 +1,5 @@
 from django import forms
 from .models import Ticket, Review
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class FollowUserForm(forms.Form):
@@ -21,22 +20,27 @@ class TicketUpdateForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
+    rating = forms.ChoiceField(
+        choices=[(str(i), str(i)) for i in range(6)],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+    )
+
     class Meta:
         model = Review
         fields = ['title', 'description', 'rating']
 
 
 class TicketAndReviewForm(forms.ModelForm):
+
     class Meta:
         model = Ticket
         fields = ['title', 'description', 'image']
-
-    rating = forms.IntegerField(
-        label="Note",
-        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    rating = forms.ChoiceField(
+        choices=[(str(i), str(i)) for i in range(6)],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
     )
     critique_title = forms.CharField(label="Titre de la critique")
     critique_description = forms.CharField(
-        label="Description de la critique",
+        label="Commentaire",
         widget=forms.Textarea
     )
