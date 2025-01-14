@@ -1,51 +1,6 @@
-/* Styling pour le conteneur du titre et des boutons */
-.title-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.text-right {
-    text-align: right;
-}
-
-/* Styling pour le bloc principal "post-block" */
-.your-flux {
-    background-color: #f4f4f4; /* Couleur de fond du bloc principal */
-}
-
-/* Styling pour le lien "Créer un Ticket" */
-.btn-create-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-}
-
-/* Styling pour le bouton "Créer un ticket" */
-.btn-create {
-    background-color: #f4f4f4; /* Couleur de fond du bouton, correspond à celle du bloc principal */
-    color: #333;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-.btn-create:hover {
-    background-color: #ddd; /* Couleur légèrement plus foncée au survol */
-}
-
-/* Styling pour les boutons dans le conteneur */
-.btn-container {
-    display: flex;
-    gap: 10px;
-}
-
-/* Styling pour le bloc principal de contenu */
-.post-block {
+/* Bloc de contenu principal */
+.ticket-snippet-container,
+.review-snippet-container {
     max-width: 100%;
     width: 1000px;
     margin: 0 auto;
@@ -57,29 +12,9 @@
     flex-direction: column;
 }
 
-.connected::after {
-  content: "";
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  background-color: green;
-  border-radius: 50%;
-  margin-left: 5px;
-}
-
-/* Styling pour le bloc principal de contenu */
-.post-block {
-    max-width: 100%; /* Largeur maximale */
-    width: 1000px; /* Largeur initiale */
-    margin: 0 auto;
-    padding: 20px;
-    background: linear-gradient(to bottom, #f4f4f4, rgba(244, 244, 244, 0)); /* Dégradé du haut vers le bas */
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Styling pour le titre "Votre flux" */
-.scrollable-title {
+/* Titre général de la page */
+.ticket-snippet-title,
+.review-snippet-title {
     font-size: 24px;
     font-weight: bold;
     padding: 5px 0;
@@ -87,42 +22,230 @@
     margin-bottom: 10px;
 }
 
-/* Styling pour le contenu scrollable */
-.scrollable-content {
-    max-height: 100%; /* Hauteur maximale */
-    height: 550px; /* Hauteur initiale */
-    overflow-y: auto; /* Ajoute une barre de défilement verticale si nécessaire */
+/* Bloc de ticket */
+.ticket-block,
+.critique-block {
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
 }
 
-/* Masque la barre de défilement (Chrome, Safari) */
-.scrollable-content::-webkit-scrollbar {
-    display: none;
-}
-
-/* Styling pour les blocs de ticket */
+/* Bloc de ticket */
 .ticket-block {
     background-color: #eaf4ff;
     margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 100%; /* Limiter la largeur maximale */
 }
 
-/* Styling pour les blocs de critique */
+/* Bloc de critique */
 .critique-block {
     background-color: #f9f9f9;
     border-left: 4px solid #ffc107;
-    padding: 10px;
     margin-left: 20px;
-    border-radius: 5px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    max-width: 100%; /* Limiter la largeur maximale */
 }
 
-/* Styling pour les détails du ticket associé */
+/* Détails du ticket */
 .ticket-details {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #ddd;
+}
+
+/* Style des boutons */
+button,
+.btn-create {
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.2s, background-color 0.3s, border-color 0.3s ease-in-out;
+    background-color: transparent; /* assurez-vous qu'il y ait une couleur de fond par défaut */
+    border-color: #e68a47; /* couleur d'encadrement par défaut */
+}
+
+/* Boutons pour créer un ticket et une critique */
+.btn-create-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.btn-create {
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-create:hover {
+    background-color: #ddd;
+}
+
+/* Style pour les boutons de ticket et critique */
+.btn-primary,
+.btn-secondary {
+    color: white;
+    border-color: transparent;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+}
+
+.review-message {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+}
+
+.posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);  /* Ombre plus subtile */
+    background-color: rgba(255, 255, 255, 0.1); /* Fond presque transparent (10%) */
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Bordure légèrement transparente */
+}
+
+/* Style général des posts */
+.post {
+    padding: 25px;
+    width: 100%;
+    max-width: 1100px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.post.ticket {
+    background-color: rgba(230, 247, 255, 0.7);
+    border-color: rgba(179, 217, 255, 0.7);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post.review {
+    background-color: rgba(255, 243, 230, 0.7);
+    border-color: rgba(255, 179, 179, 0.7);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Conteneur spécifique pour le type de contenu */
+.content-type-container {
+    margin: 20px auto;
+    background-color: #f4f4f4;
+    border-radius: 12px;
+    padding: 25px;
+    width: 95%;
+    max-width: 1200px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style pour le type de contenu */
+.content-type {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* Style spécifique pour le type de contenu "TICKET" */
+.post.ticket .content-type-container {
+    background-color: #e1f7fc;
+    color: #0275d8;
+    border: 1px solid #0275d8;
+}
+
+/* Style spécifique pour le type de contenu "REVIEW" */
+.post.review .content-type-container {
+    background-color: #ffe4e1;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+}
+
+/* Conteneur du titre Flux Général */
+.flux-general-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Titre Flux Général */
+.flux-general-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #FF9A8B, #FDCB82);
+    color: transparent;
+    background-clip: text;
+}
+
+/* Conteneur des boutons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Style des boutons */
+button {
+    padding: 12px 24px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(90deg, #FF9A8B, #FDCB82);
+    color: transparent;
+    background-clip: text;
+    transition: transform 0.3s, background-color 0.3s, border-color 0.3s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 155, 86, 0.2);
+    border-color: #E68A47;
+    color: #E68A47;
+}
+
+
+.button-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+button:hover,
+.btn-create:hover {
+    background-color: rgba(255, 155, 86, 0.2);
+    border-color: #e68a47;
+    color: #e68a47;
+    transform: scale(1.05);
 }

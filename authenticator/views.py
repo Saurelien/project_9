@@ -32,4 +32,3 @@ class ListAllUser(ListView):
     model = User
     template_name = 'authenticator/user_list.html'
     context_object_name = 'users'
-

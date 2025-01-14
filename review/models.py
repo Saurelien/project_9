@@ -18,6 +18,10 @@ class Ticket(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def type(self):
+        return "ticket"
+
 
 class Review(models.Model):
     ticket = models.ForeignKey(to=Ticket, on_delete=models.CASCADE, related_name="reviews")
@@ -37,18 +41,24 @@ class Review(models.Model):
     def __str__(self):
         return f"Critique de {self.ticket.title} par {self.user.username}, Note: {self.rating}"
 
+    class Meta:
+        unique_together = ('ticket', 'user')
+
     def get_star_rating(self):
-        # Créer une chaîne d'étoiles en fonction de la note attribuée
-        return '★' * self.rating
+        return '★' * self.rating + '☆' * (5 - self.rating)
 
     def get_absolute_url(self):
         return reverse('update_review', args=[str(self.pk)])
+
+    @property
+    def type(self):
+        return "review"
 
 
 class UserFollows(models.Model):
     # Utilisateurs suivis " User "
     follower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='following')
-    # Utilisateur abonnés " followed_user
+    # Utilisateur abonnés " followed_user "
     followed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='followers')
 
     class Meta:

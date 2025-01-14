@@ -3,5 +3,34 @@
 {% block title %}Flux Général{% endblock %}
 
 {% block content %}
-        {% include 'review/_flux_snippet.html' %}
+    <div class="flux-general-container">
+        <h1 class="flux-general-title">Flux Général</h1>
+        <div class="action-buttons">
+            <button class="btn btn-primary">
+                <a href="{% url 'create_ticket' %}" class="button-link">Créer un ticket</a>
+            </button>
+            <button class="btn btn-secondary">
+                <a href="{% url 'review' %}" class="button-link">Créer un ticket avec une critique</a>
+            </button>
+        </div>
+    </div>
+
+    <div class="posts-container">
+        {% for post in posts %}
+            <div class="post {% if post.content_type == 'TICKET' %}ticket{% elif post.content_type == 'REVIEW' %}review{% endif %}">
+                {% if DISPLAY_HELPER %}
+                <div class="content-type-container">
+                    <p class="content-type">
+                        <strong>Type de contenu : {{ post.content_type }}</strong>
+                    </p>
+                </div>
+                {% endif %}
+                {% if post.content_type == 'TICKET' %}
+                    {% include 'review/ticket_snippet.html' with ticket=post %}
+                {% elif post.content_type == 'REVIEW' %}
+                    {% include 'review/review_snippet.html' with review=post %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

@@ -59,6 +59,8 @@ LOGIN_REDIRECT_URL = "/flux/"
 
 ROOT_URLCONF = 'project.urls'
 
+DISPLAY_HELPER = False
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -70,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'review.context_processors.display_helper',
             ],
         },
     },

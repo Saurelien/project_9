@@ -1,28 +1,32 @@
 {% extends 'skeleton.html' %}
+{% load static %}
 
 {% block title %}Créer une critique{% endblock %}
 
 {% block content %}
     <div class="post-block your-flux">
-        <h2>Créer une critique pour le ticket associé à l'id [{{ ticket.id }}]</h2>
+        <h2>Vous êtes en train de poster en réponse à {{ ticket.title }} [{{ ticket.id }}] de {{ ticket.creator }}</h2>
         <h3>Titre du ticket : {{ ticket.title }}</h3>
         <p>Description : {{ ticket.description|linebreaksbr }}</p>
         <p>Créateur du ticket : {{ ticket.creator }}</p>
         {% if ticket.image %}
-        <img src="{{ ticket.image.url }}" alt="Image du ticket" width="300" height="400">
+            <img src="{{ ticket.image.url }}" alt="Image du ticket" width="300" height="400">
         {% endif %}
+
         <form method="post">
             {% csrf_token %}
             <p>Titre de la critique: {{ form.title }}</p>
             <p>Commentaire: {{ form.description }}</p>
+
             <div class="form-check form-check-inline">
                 {% for choice_value, choice_label in form.rating.field.choices %}
                     <label class="form-check-label">
                         <input class="form-check-input" type="radio" name="{{ form.rating.name }}" value="{{ choice_value }}" {% if choice_value == form.rating.value %}checked{% endif %}>
-                        {{ choice_label }}
+                        {{ choice_label }} étoiles
                     </label>
                 {% endfor %}
             </div>
+
             <input type="submit" value="Créer la critique">
         </form>
     </div>

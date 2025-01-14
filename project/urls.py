@@ -1,5 +1,5 @@
 """
-URL configuration for project project.
+URL configuration for project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from authenticator.views import RegisterView, LogoutUserView, ListAllUser, LoginView
-from review.views import FluxView, FollowUserView, TicketCreateView, PostsView,\
-    UnfollowUserView, SubscribeUserView, TicketUpdateView, TicketDeleteView, CreateReviewView, UpdateReviewView,\
-    DeleteReviewView, CreateTicketAndReviewView
+from authenticator.views import RegisterView, LogoutUserView, LoginView
+from review.views import (
+    FluxView, FollowUserView, TicketCreateView, PostsView,
+    UnfollowUserView, SubscribeUserView, TicketUpdateView, TicketDeleteView,
+    CreateReviewView, UpdateReviewView, DeleteReviewView, CreateTicketAndReviewView)
 from django.conf import settings
 from django.conf.urls.static import static
 

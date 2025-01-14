@@ -1,15 +1,24 @@
 {% extends 'skeleton.html' %}
+{% load static %}
 
-    {% block title %}Mettre à jour une critique{% endblock %}
+{% block title %}Mettre à jour une critique{% endblock %}
 
 {% block content %}
     <div class="post-block your-flux">
-        <h2>Modifier la critique {{ ticket.post.title }}</h2>
+        <h2>Modifier la critique pour le ticket: {{ object.ticket.title }}</h2>
+
+        {% if object.ticket.image %}
+            <div class="ticket-image">
+                <img src="{{ object.ticket.image.url }}" alt="Image du ticket" width="300" height="400">
+            </div>
+        {% endif %}
+
         <br>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <p>Titre de la critique: {{ form.title }}</p>
             <p>Commentaire: {{ form.description }}</p>
+
             <div class="form-check form-check-inline">
                 {% for choice_value, choice_label in form.rating.field.choices %}
                     <label class="form-check-label">

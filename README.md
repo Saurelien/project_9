@@ -1,25 +1,25 @@
 # Développez une application Web en utilisant Django
 
 Developper une application web permettant à une communauté d'utilisateurs
-de consulterou de solliciter une critique de livres à la demande
+de consulter ou de solliciter une critique de livres à la demande
 
-## Installation
+# Installation
 
-1. # Clonez le dépôt:
-   `git clone https://github.com/Saurelien/project_9.git`
-3. # Accédez au répertoire du projet :
-   Utilisez la commande cd pour accéder au répertoire du projet que vous venez de cloner :
-   cd nom_du_projet
-3. # Créez et activez un environnement virtuel (facultatif mais recommandé):
-   `python -m venv venv`
-5. # Activez ensuite l'environnement virtuel :
-   Sur Windows :
-   `venv\Scripts\activate`
-   Sur macOS et Linux :
-   `source venv/bin/activate`
-3. # Installez les dépendances.
-   Si le projet a des dépendances listées dans un fichier requirements.txt, installez-les en utilisant la commande suivante
-   ` pip install -r requirements.txt `
+   - # Clonez le dépôt:
+     `git clone https://github.com/Saurelien/project_9.git`
+   - # Accédez au répertoire du projet :
+    - Utilisez la commande cd pour accéder au répertoire du projet que vous venez de cloner :
+    ' cd nom_du_projet '
+   - # Créez et activez un environnement virtuel :
+     `python -m venv venv`
+     - # Activez ensuite l'environnement virtuel :
+       Sur Windows :
+     `venv\Scripts\activate`
+     Sur macOS et Linux :
+     `source venv/bin/activate`
+   - # Installez les dépendances.
+    'Si le projet a des dépendances listées dans un fichier requirements.txt, installez-les en utilisant la commande suivante
+    ` pip install -r requirements.txt `
 
 4. # Fonctionnalités
 

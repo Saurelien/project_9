@@ -1,0 +1,47 @@
+<div class="ticket-snippet-container">
+    <div class="ticket-snippet-title">
+        <h2>{{ ticket.title }}</h2>
+    </div>
+
+    <div class="ticket-block">
+        <p><strong>Id du ticket:</strong> {{ ticket.id }}</p>
+        <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
+        <p><strong>Créateur du ticket:</strong> {{ ticket.creator.username }}</p>
+
+        {% if ticket.image %}
+            <img src="{{ ticket.image.url }}" alt="Image du ticket" class="ticket-image">
+        {% endif %}
+
+        <div class="ticket-details">
+            <p><strong>Date de création:</strong> {{ ticket.created_at }}</p>
+        </div>
+
+        <!-- Affichage des critiques du ticket par ordre antéchronologique -->
+        {% load reviews_filter %}
+        <div class="ticket-reviews">
+            <h3>Critiques sur ce ticket</h3>
+            {% for review in ticket|sort_reviews_by_date %}
+                <div class="critique-block">
+                    <p><strong>Critique de:</strong> {{ review.user.username }}</p>
+                    <p><strong>Note critique:</strong> {{ review.get_star_rating }}</p>
+                    <p><strong>Description:</strong> {{ review.description|linebreaksbr }}</p>
+                    <p><strong>Date de création:</strong> {{ review.created_at }}</p>
+                </div>
+            {% empty %}
+                <p>Il n'y a pas encore de critiques pour ce ticket.</p>
+            {% endfor %}
+        </div>
+
+        <!--SI l'utilisateur est ou n'est pas le créateur afficher le bouton donner un avis si l'utilisateur connecté n'a pas encore donné son avis sinon lui afficher un message -->
+        {% load reviews_filter %}
+        {% if not ticket|has_reviewed:user %}
+            <div class="action-buttons">
+                <a href="{% url 'create_review' ticket.id %}" class="btn-create">Donner un avis</a>
+            </div>
+        {% else %}
+            <div class="review-message">
+                <p>Vous avez déjà donné un avis pour ce ticket.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

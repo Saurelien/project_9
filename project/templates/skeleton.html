@@ -13,10 +13,10 @@
 <body>
     <nav>
         <ul>
-            <li><a href="{% url 'flux' %}">Flux</a></li>
-            <li><a href="{% url 'posts' %}">Posts</a></li>
-            <li><a href="{% url 'flux_utilisateurs' %}">Abonnements</a></li>
             {% if user.is_authenticated %}
+                <li><a href="{% url 'flux' %}">Flux</a></li>
+                <li><a href="{% url 'posts' %}">Posts</a></li>
+                <li><a href="{% url 'flux_utilisateurs' %}">Abonnements</a></li>
                 <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
             {% endif %}
             {% if request.user.is_superuser %}

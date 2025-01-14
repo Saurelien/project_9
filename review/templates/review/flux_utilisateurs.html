@@ -4,13 +4,26 @@
 
 {% block content %}
     <div class="post-block your-flux">
-        <h2 class="scrollable-title">Système d'abonnement</h2>
+        <h1 class="scrollable-title">Système d'abonnement</h1>
+
+        <!-- Affichage des messages -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <form method="POST" action="{% url 'subscribe_user' %}">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Rechercher un utilisateur">
             <button type="submit">Cliquer pour suivre l'utilisateur</button>
         </form>
-        <h1>Utilisateurs suivis</h1>
+
+        <h2>Utilisateurs suivis</h2>
         <ul>
             {% for s_user in utilisateurs_suivis %}
                 <li>
@@ -23,11 +36,14 @@
             {% endfor %}
         </ul>
 
-        <h1>Utilisateurs abonnés</h1>
+        <h2>Utilisateurs abonnés</h2>
         <ul>
             {% for f_user in abonnes %}
                 <li>{{ f_user.follower.username }}</li>
             {% endfor %}
         </ul>
+
+        <!-- Bouton retour -->
+        <a href="{% url 'posts' %}" class="back-button">Retour à votre flux personnel</a>
     </div>
 {% endblock %}

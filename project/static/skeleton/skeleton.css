@@ -129,13 +129,25 @@ body::after {
     margin-bottom: 10px;
 }
 
-.login-form button {
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
+
+button, .login-form button {
+    padding: 12px 24px;
+    border: 2px solid transparent;
     cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(90deg, #FF9A8B, #FDCB82);
+    color: transparent;
+    background-clip: text;
+    transition: transform 0.3s, background-color 0.3s, border-color 0.3s ease-in-out;
+}
+
+button:hover, .login-form button:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 155, 86, 0.2);
+    border-color: #E68A47;
+    color: #E68A47;
 }
 
 .register-button {
@@ -172,7 +184,7 @@ body::after {
 }
 
 .btn-primary {
-  background-color: #007bff; /* Couleur personnalisée pour le bouton "Afficher la liste des utilisateurs" */
+  background-color: #007bff;
 }
 
 /* Styles for the navigation bar */
@@ -200,12 +212,11 @@ nav ul li a {
 }
 
 
-/* Style for the connected username */
+/* Style connected username */
 .username {
   margin-left: 10px;
 }
 
-/* Example of changing the status dot color based on user status */
 .username.connected .status-dot {
   background-color: green;
 }
@@ -216,4 +227,21 @@ nav ul li a {
     display: block;
     margin: 5px 0;
   }
+}
+
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
 }

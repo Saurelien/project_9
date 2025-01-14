@@ -1,53 +1,66 @@
-<div class="post-block your-flux">
-    <h2 class="scrollable-title">Vôtre Flux Personnel</h2>
-    <button>
-        <a href="{% url 'create_ticket' %}">Créer un ticket</a>
-    </button>
-    <button>
-        <a href="{% url 'review' %}">Créer une critique</a>
-    </button>
-    {% for ticket in all_tickets %}
+{% for post in combined_posts %}
+    {% if post.content_type == 'ticket' %}
+        <div class="ticket-snippet-container">
+            <h3 class="ticket-snippet-title">Ticket : {{ post.title }}</h3>
+            <div class="ticket-block">
+                <p><strong>Id du ticket:</strong> [{{ post.id }}]</p>
+                <p>Auteur du Ticket: [{{ post.creator.username }}]</p>
+                <p><strong>Description:</strong> {{ post.description|linebreaksbr }}</p>
 
-        <div class="ticket-block">
-            <p><strong>Id du ticket [{{ ticket.id }}]</strong></p>
-            <p>Ticket - [{{ ticket.creator }}]</p>
-            <h3>Titre du ticket: {{ ticket.title }}</h3>
-            <p>Description: {{ ticket.description|linebreaksbr }}</p>
-            {% if ticket.image %}
-            <img src="{{ ticket.image.url }}" alt="Image du ticket">
-            {% endif %}
-            <p>Date de création du ticket: {{ ticket.created_at }}</p>
-            {% if ticket.creator == user %}
-                <form>
-                    <button><a href="{% url 'update_ticket' ticket.pk %}">Modifier le ticket</a></button>
-                    <button><a href="{% url 'delete_ticket' ticket.pk %}">Supprimer le ticket</a></button>
-                    <button><a href="{% url 'create_review' ticket.id %}">Répondre au ticket</a></button>
-                </form>
-            {% endif %}
-            <!-- Afficher les critiques de l'utilisateur connecté associées au ticket de l'utilisateur suivit -->
-            {% for critique in ticket.reviews.all %}
-                {% if critique.user == user %}
-                    <div class="critique-block">
-                        <p>{{ critique.user.username }} a crée une critique pour le ticket: [{{ ticket.id }}] </p>
-                        <p>Titre de la critique: {{ critique.title }}</p>
-                        <p>Auteur de la critique: {{ critique.user.username }}</p>
-                        <p>Commentaire: {{ critique.description|linebreaksbr }}</p>
-                        <p>Date de création de la critique: {{ critique.created_at }}</p>
-                        <p>Score du ticket: {{ critique.get_star_rating }}</p>
-                        {% if critique.user == user %}
-                        <button><a href="{% url 'update_review' critique.pk %}">Modifier la critique</a></button>
-                        <button><a href="{% url 'delete_review' critique.pk %}">Supprimer la critique</a></button>
-                        {% endif %}
-                        <h2>Détails du ticket</h2>
-                        <p><strong>Id du ticket [{{ ticket.id }}]</strong></p>
-                        <p>Ticket - [{{ ticket.creator }}]</p>
-                        <h3>Titre du ticket: {{ ticket.title }}</h3>
-                        <p>Description: {{ ticket.description|linebreaksbr }}</p>
-                        <img src="{% if ticket.image %}{{ ticket.image.url }}{% else %}url_vers_une_image_par_defaut.png{% endif %}" alt="Image du ticket">
-                        <p>Date de création du ticket: {{ ticket.created_at }}</p>
-                    </div>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="Image du ticket">
                 {% endif %}
-            {% endfor %}
+
+                <p><strong>Date de création:</strong> {{ post.created_at }}</p>
+
+                <!-- Affichage des boutons si l'utilisateur a créé le ticket -->
+                <div class="action-buttons">
+                    {% if post.creator == user %}
+                        <button class="btn-primary"><a href="{% url 'update_ticket' post.pk %}" class="button-link">Modifier le ticket</a></button>
+                        <button class="btn-secondary"><a href="{% url 'delete_ticket' post.pk %}" class="button-link">Supprimer le ticket</a></button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    {% endfor %}
-</div>
+    {% else %}
+        <!-- Affichage de la critique -->
+        <div class="review-snippet-container">
+            <div class="critique-block">
+                <h4 class="review-snippet-title">Critique en réponse au ticket : {{ post.ticket.title }} <strong>De:</strong> {{ post.ticket.creator }}</h4>
+
+                <!-- Informations sur la critique -->
+                <p><strong>Auteur de la critique:</strong> {{ post.user.username }}</p>
+                <p><strong>Titre de la critique:</strong> {{ post.title }}</p>
+                <p><strong>Commentaire:</strong> {{ post.description|linebreaksbr }}</p>
+
+                <div class="ticket-details">
+                    <p><strong>Date de création de la critique:</strong> {{ post.created_at }}</p>
+                    <p><strong>Note critique:</strong> {{ post.get_star_rating }}</p>
+                </div>
+
+                <!-- Détails du ticket associé à la critique -->
+                <div class="ticket-details">
+                    <p><strong>Titre du ticket:</strong> {{ post.ticket.title }}</p>
+                    <p><strong>Auteur du ticket:</strong>{{ post.ticket.creator }}</p>
+                    <p><strong>Description du ticket:</strong> {{ post.ticket.description|linebreaksbr }}</p>
+
+                    {% if post.ticket.image %}
+                        <img src="{{ post.ticket.image.url }}" alt="Image du ticket" class="ticket-image">
+                    {% endif %}
+                </div>
+
+                <!-- Affichage des boutons pour le créateur de la critique -->
+                {% if post.user == user %}
+                <div class="action-buttons">
+                    <button class="btn-primary">
+                        <a href="{% url 'update_review' post.pk %}" class="button-link">Modifier la critique</a>
+                    </button>
+                    <button class="btn-secondary">
+                        <a href="{% url 'delete_review' post.pk %}" class="button-link">Supprimer la critique</a>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,35 @@
+<div class="review-snippet-container">
+    <div class="review-snippet-title">
+        {% if review.user == user %}
+            <h3>Vous avez donné un avis sur le ticket "{{ review.ticket.title }}" (ID: {{ review.ticket.id }})</h3>
+        {% else %}
+            <h3>{{ review.user.username }} a donné son avis sur le ticket "{{ review.ticket.title }}" (ID: {{ review.ticket.id }})</h3>
+        {% endif %}
+    </div>
+
+    <div class="critique-block">
+        <!-- Informations sur la structure de la critique -->
+        <p><strong>Auteur de la critique:</strong> {{ review.user.username }}</p>
+        <p><strong>Titre de la critique:</strong> {{ review.title }}</p>
+        <p><strong>Commentaire:</strong> {{ review.description|linebreaksbr }}</p>
+
+        <div class="ticket-details">
+            <p><strong>Date de création de la critique:</strong> {{ review.created_at }}</p>
+            <p><strong>Note critique:</strong> {{ review.get_star_rating }}</p>
+        </div>
+
+        <!-- Résumé du ticket dans la critique -->
+        <div class="ticket-summary">
+            <h4>Résumé du ticket :</h4>
+            <p><strong>Créé par:</strong> {{ review.ticket.creator.username }}</p>
+            <p><strong>Titre du ticket:</strong> {{ review.ticket.title }}</p>
+            <p><strong>Description:</strong> {{ review.ticket.description|linebreaksbr }}</p>
+            {% if review.ticket.image %}
+                <p><strong>Image associée:</strong></p>
+                <img src="{{ review.ticket.image.url }}" alt="Image du ticket" style="max-width: 200px; max-height: 200px;">
+            {% endif %}
+            <p><strong>Date de création du ticket:</strong> {{ review.ticket.created_at }}</p>
+            <p><strong>Dernière mise à jour:</strong> {{ review.ticket.updated_at }}</p>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,8 @@
+from itertools import chain
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
+
 from review.forms import FollowUserForm, TicketForm, TicketUpdateForm, ReviewForm, TicketAndReviewForm
 from django.views.generic import FormView, UpdateView, CreateView, ListView, TemplateView
 from review.models import UserFollows, Review, Ticket
@@ -9,34 +13,39 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django import forms
 from django.views.generic import DeleteView
-from django.db.models import Q
+from django.db.models import Q, CharField, Value
 from PIL import Image
 import uuid
 from django.conf import settings
 from pathlib import Path
-from itertools import chain
 
 UserModel = get_user_model()
 
 
 class FluxView(LoginRequiredMixin, ListView):
-    """
-    Vue pour afficher le flux de l'utilisateur avec des publications filtrées et organisées.
-    Cette vue récupère les publications (à la fois les tickets et les critiques)
-    des utilisateurs suivis par l'utilisateur connecté,
-    les organise pour éliminer les doublons de tickets, et les affiche dans un format convivial.
-    """
     template_name = 'review/flux.html'
-    context_object_name = 'tickets'
+    context_object_name = 'posts'
 
     def get_queryset(self):
+        user = self.request.user
 
-        # Récupérer les utilisateurs suivis par l'utilisateur connecté
-        utilisateurs_suivis = self.request.user.following.all()
-        # Créer une liste d'utilisateurs à partir des utilisateurs suivis
-        users = [user.followed_user for user in utilisateurs_suivis]
-        return Ticket.objects.filter(Q(creator__in=users) |
-                                     Q(reviews__user__in=users)).distinct().order_by('-created_at')
+        followed_users = user.following.all().values_list('followed_user', flat=True)
+
+        tickets = Ticket.objects.filter(
+            Q(creator=user) | Q(creator__in=followed_users)
+        ).annotate(content_type=Value('TICKET', CharField()))
+
+        reviews = Review.objects.filter(
+            Q(user=user) | Q(user__in=followed_users) | Q(ticket__creator=user)
+        ).annotate(content_type=Value('REVIEW', CharField()))
+
+        posts = sorted(
+            chain(tickets, reviews),
+            key=lambda post: post.created_at,
+            reverse=True
+        )
+
+        return posts
 
 
 class PostsView(LoginRequiredMixin, TemplateView):
@@ -46,23 +55,20 @@ class PostsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # Récupérer les tickets créés par l'utilisateur (antichronologique)
-        user_tickets = Ticket.objects.filter(creator=user).order_by('-created_at')
+        # Récupérer uniquement les tickets créés par l'utilisateur
+        user_tickets = Ticket.objects.filter(creator=user).annotate(content_type=Value('ticket', CharField()))
 
-        # Récupérer les tickets des utilisateurs suivis (sans tri)
-        users_followed = UserFollows.objects.filter(follower=user).values_list('followed_user', flat=True)
-        # récupération des tickets associées à la critique de l'utilisateur connecté
-        followed_tickets_with_user_critiques = Ticket.objects.filter(
-            creator__in=users_followed,
-            reviews__user=user
-        ).distinct().order_by('-created_at')
-        all_tickets = sorted(
-            chain(user_tickets, followed_tickets_with_user_critiques),
-            key=lambda ticket: ticket.created_at,
+        # Récupérer uniquement les critiques créées par l'utilisateur
+        user_reviews = Review.objects.filter(user=user).annotate(content_type=Value('review', CharField()))
+
+        # Fusionner les deux ensembles et trier par date de création
+        combined_posts = sorted(
+            chain(user_tickets, user_reviews),
+            key=lambda post: post.created_at,
             reverse=True
         )
 
-        context['all_tickets'] = all_tickets
+        context['combined_posts'] = combined_posts
         return context
 
 
@@ -77,8 +83,10 @@ class SubscribeUserView(View):
             # S'assurer que l'utilisateur existe avant de le suivre
             if user_to_follow:
                 if user_to_follow.username == request.user.username:
-                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même.")
-                elif not UserFollows.objects.filter(follower=request.user, followed_user=user_to_follow).exists():
+                    messages.error(request,
+                                   "Vous ne pouvez pas vous suivre vous-même.")
+                elif not UserFollows.objects.filter(follower=request.user,
+                                                    followed_user=user_to_follow).exists():
                     # Créer la relation de suivi
                     UserFollows.objects.create(follower=request.user, followed_user=user_to_follow)
                     messages.success(request, f"Vous suivez maintenant {user_to_follow.username}.")
@@ -134,19 +142,33 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     template_name = 'review/create_ticket.html'
     form_class = TicketForm
-    success_url = reverse_lazy('flux')
+    success_url = reverse_lazy('posts')
 
     def form_valid(self, form):
         form.instance.creator = self.request.user
 
         image = form.cleaned_data['image']
         if image:
-            image_name = f'ticket_{uuid.uuid4().hex}.jpg'  # Générer un nom de fichier unique
-            img = Image.open(image)
-            img.thumbnail((300, 300))
-            img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
+            try:
+                # Générer un nom unique pour l'image
+                image_name = f'ticket_{uuid.uuid4().hex}.jpg'
+                img = Image.open(image)
 
-            form.instance.image = f'ticket_images/{image_name}'  # Enregistrer le chemin de l'image
+                # Convertir l'image en RGB si elle n'est pas déjà dans ce mode
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+
+                # Redimensionner l'image
+                img.thumbnail((300, 300))
+
+                # Sauvegarder l'image dans le répertoire approprié
+                img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
+
+                # Enregistrer le chemin de l'image dans le modèle
+                form.instance.image = f'ticket_images/{image_name}'
+
+            except Exception as e:
+                raise ValidationError(f"Erreur lors du traitement de l'image : {str(e)}")
 
         return super().form_valid(form)
 
@@ -178,7 +200,7 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
     model = Ticket
     template_name = 'review/update_ticket.html'
     form_class = TicketUpdateForm
-    success_url = '/posts/'
+    success_url = '/flux/'
 
 
 class TicketDeleteView(DeleteView):
@@ -234,7 +256,7 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
         form.save()
 
-        # Redirect back to the ticket's detail page
+        # Redirige l'utilisateur vers son flux personnel une fois la critique posté
         return redirect('flux')
 
 
@@ -251,13 +273,10 @@ class DeleteReviewView(DeleteView):
     context_object_name = 'critique'
 
     def get_success_url(self):
-        # Rediriger l'utilisateur vers le flux ou une autre page après la suppression de la critique
-        return reverse_lazy('flux')
+        return reverse_lazy('posts')
 
     def delete(self, request, *args, **kwargs):
         critique = self.get_object()
-
-        # Supprimer la critique
         critique.delete()
 
         messages.success(self.request, "La critique a été supprimée avec succès.")
@@ -267,7 +286,7 @@ class DeleteReviewView(DeleteView):
 class CreateTicketAndReviewView(LoginRequiredMixin, CreateView):
     template_name = 'review/review.html'
     form_class = TicketAndReviewForm
-    success_url = reverse_lazy('posts')
+    success_url = reverse_lazy('flux')
 
     def form_valid(self, form):
 

@@ -1,4 +1,6 @@
 from django import forms
+from django.forms import ClearableFileInput
+
 from .models import Ticket, Review
 
 
@@ -13,10 +15,17 @@ class TicketForm(forms.ModelForm):
         fields = ['title', 'description', 'image']
 
 
+class CustomClearableFileInput(ClearableFileInput):
+    template_name = 'widgets/custom_clearable_file_input.html'
+
+
 class TicketUpdateForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ['title', 'description', 'image']
+        widgets = {
+            'image': CustomClearableFileInput()
+        }
 
 
 class ReviewForm(forms.ModelForm):
