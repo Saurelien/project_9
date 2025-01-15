@@ -3,3 +3,4 @@
 DOC/
 .venv/
 **/__pycache__/
+**.venv/
