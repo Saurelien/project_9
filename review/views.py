@@ -1,3 +1,4 @@
+import os
 from itertools import chain
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -150,15 +151,18 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
         image = form.cleaned_data['image']
         if image:
             try:
+                ticket_images_path = Path(settings.MEDIA_ROOT) / 'ticket_images'
+
+                # Créer le dossier s'il n'existe pas
+                os.makedirs(ticket_images_path, exist_ok=True)
+
                 image_name = f'ticket_{uuid.uuid4().hex}.jpg'
                 img = Image.open(image)
 
                 if img.mode != 'RGB':
                     img = img.convert('RGB')
                 img.thumbnail((300, 300))
-                img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
-
-                # Enregistrer le chemin de l'image dans le modèle
+                img.save(ticket_images_path / image_name)
                 form.instance.image = f'ticket_images/{image_name}'
 
             except Exception as e:
@@ -276,15 +280,21 @@ class CreateTicketAndReviewView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('flux')
 
     def form_valid(self, form):
-
         image = form.cleaned_data['image']
         if image:
+            # Définir le chemin complet du dossier où les images seront stockées
+            ticket_images_path = Path(settings.MEDIA_ROOT) / 'ticket_images'
+
+            # Créer le dossier s'il n'existe pas
+            os.makedirs(ticket_images_path, exist_ok=True)
+
             image_name = f'ticket_{uuid.uuid4().hex}.jpg'
             img = Image.open(image)
             img.thumbnail((300, 300))
-            img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
+            img.save(ticket_images_path / image_name)
 
             form.instance.image = f'ticket_images/{image_name}'
+
         ticket = form.save(commit=False)
         ticket.creator = self.request.user
         ticket.save()
