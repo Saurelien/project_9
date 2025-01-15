@@ -150,18 +150,12 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
         image = form.cleaned_data['image']
         if image:
             try:
-                # Générer un nom unique pour l'image
                 image_name = f'ticket_{uuid.uuid4().hex}.jpg'
                 img = Image.open(image)
 
-                # Convertir l'image en RGB si elle n'est pas déjà dans ce mode
                 if img.mode != 'RGB':
                     img = img.convert('RGB')
-
-                # Redimensionner l'image
                 img.thumbnail((300, 300))
-
-                # Sauvegarder l'image dans le répertoire approprié
                 img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
 
                 # Enregistrer le chemin de l'image dans le modèle
@@ -176,13 +170,10 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
         form = super().get_form(form_class)
         ticket_id = self.kwargs.get('ticket_id')
         if ticket_id:
-            # Si un ticket_id est fourni dans l'URL, récupérez le ticket existant
             ticket = get_object_or_404(Ticket, id=ticket_id)
-            # Pré-remplissez les champs du formulaire avec les valeurs du ticket existant
             form.initial['title'] = ticket.title
             form.initial['description'] = ticket.description
             form.initial['image'] = ticket.image
-            # Masquer le champ "note" dans le formulaire car il sera géré séparément
             form.fields['note'].widget = forms.HiddenInput()
         return form
 
@@ -211,16 +202,13 @@ class TicketDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         ticket = self.get_object()
 
-        # Supprimer l'image du ticket s'il existe
         if ticket.image:
             try:
-                # Supprimer le fichier d'image en utilisant PIL
                 ticket.image.delete()
             except Exception as e:
-                # Gérer les erreurs éventuelles spécifiques à Pillow
+
                 messages.error(self.request, f"Erreur lors de la suppression de l'image : {e}")
 
-        # Supprimer toutes les critiques liées à ce ticket
         ticket.critique_set.all().delete()
         messages.success(self.request, "Le ticket a été supprimé avec succès.")
         return super().delete(request, *args, **kwargs)
@@ -256,7 +244,6 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
         form.save()
 
-        # Redirige l'utilisateur vers son flux personnel une fois la critique posté
         return redirect('flux')
 
 
@@ -298,7 +285,6 @@ class CreateTicketAndReviewView(LoginRequiredMixin, CreateView):
             img.save(Path(settings.MEDIA_ROOT) / 'ticket_images' / image_name)
 
             form.instance.image = f'ticket_images/{image_name}'
-        # Créez le ticket
         ticket = form.save(commit=False)
         ticket.creator = self.request.user
         ticket.save()
