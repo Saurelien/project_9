@@ -81,11 +81,10 @@ class SubscribeUserView(View):
             # Recherche de l'utilisateur à suivre
             user_to_follow = UserModel.objects.filter(username=username).first()
 
-            # S'assurer que l'utilisateur existe avant de le suivre
+            # Vérifier si l'utilisateur existe
             if user_to_follow:
                 if user_to_follow.username == request.user.username:
-                    messages.error(request,
-                                   "Vous ne pouvez pas vous suivre vous-même.")
+                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même.")
                 elif not UserFollows.objects.filter(follower=request.user,
                                                     followed_user=user_to_follow).exists():
                     # Créer la relation de suivi
@@ -93,6 +92,10 @@ class SubscribeUserView(View):
                     messages.success(request, f"Vous suivez maintenant {user_to_follow.username}.")
                 else:
                     messages.error(request, f"Vous suivez déjà {user_to_follow.username}.")
+            else:
+                messages.error(request, "Cet utilisateur n'existe pas.")
+        else:
+            messages.error(request, "Veuillez entrer un nom d'utilisateur.")
 
         return redirect('flux_utilisateurs')
 
