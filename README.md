@@ -4,20 +4,45 @@ Developper une application web permettant à une communauté d'utilisateurs
 de consulter ou de solliciter une critique de livres à la demande
 
 # Installation
-  # Solution en utilisant l'outil git intégré de pycharm:
-  - ## Allez dans l'onglet git:
-        Selectionné clone dans le menu déroulant
-  - ## Saisissez l'url de dépot distant dans le formulaire de la fenêtre 
-        https://github.com/Saurelien/project_9.git
-  - ## Saisissez le chemain du repertoire qui va contenir le projet local après le clonage:
-        Par exemple: C:\Users\cstem\PycharmProjects_9_clone_local
-  - ## Cliquer sur bouton clone:
-        Une fenêtre vous sera afficher pour vous demander
-        si vous souhaitez utiliser un autre lancement pycharm pour afficher le projet local cloné
-  - ## Nouveau projet cloné
-        - Une fois le nouveau projet cloné vous aurez la possibilité de choisir la version de l'interpreteur
-        - La création de l'environnement virtuel
-        - L'installation des dépendances necessaire au bon fonctionnement du projet
+# Cloner un projet distant avec Git dans PyCharm
+
+Ce guide explique comment utiliser l'outil Git intégré de PyCharm pour cloner un projet distant.
+
+---
+
+## Étapes
+
+1. **Allez dans l'onglet Git :**  
+   - Cliquez sur **VCS** dans la barre supérieure de PyCharm.  
+   - Sélectionnez **Get from Version Control...**. **Ou selectionnez l'onglet GIT et clone dans le menu déroulant**  
+
+   ![Onglet Git](./DOC/git_clone.png)
+
+2. **Saisissez l'URL du dépôt distant :**  
+   - Dans la fenêtre qui s'affiche, entrez l'URL suivante :  
+     ```
+     https://github.com/Saurelien/project_9.git
+     ```
+
+   ![Saisir URL](./DOC/git_form.png)
+
+3. **Choisissez un répertoire local :**  
+   - Dans le champ **Directory**, sélectionnez ou saisissez le chemin où vous souhaitez cloner le projet :  
+     Exemple : `C:\Users\cstem\PycharmProjects_9_clone_local`.
+
+4. **Cliquez sur le bouton Clone :**  
+   - Une fenêtre contextuelle peut apparaître, demandant si vous souhaitez ouvrir le projet dans une nouvelle fenêtre ou dans la fenêtre existante.  
+   - Choisissez l'option qui convient le mieux à votre flux de travail.
+
+5. **Configurer le projet après le clonage :**  
+   - Une fois le clonage terminé, configurez le projet pour l'utiliser localement :  
+     - Sélectionnez la **version de l'interpréteur** Python.  
+     - Créez un **environnement virtuel** pour isoler les dépendances.  
+     - Installez les **dépendances nécessaires** (par exemple, via `pip install -r requirements.txt`).
+     - Mais ces processus devraient ce faire automatiquement en validant le chemin de l'env virtuel, la version de l'interpreteur et le fichier d'installation des dépendances
+
+
+---
   ### Autre Option:
    - ## Clonez le dépôt:
      `git clone https://github.com/Saurelien/project_9.git`
